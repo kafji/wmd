@@ -7,7 +7,3 @@ Web search shortcuts.
 ## Installation & Usage
 
 Instructions can be found at [docs/manual.md](docs/manual.md).
-
-## Changelog
-
-Notable changes are cataloged in [CHANGELOG.md](CHANGELOG.md).
