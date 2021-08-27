@@ -58,4 +58,4 @@
 
 7. Publish binary on GitHub.
 
-    https://github.com/kafji/wmd/releases/new?tag=v0.2.0&title=0.2.0
+    https://github.com/kafji/wmd/releases/new?tag=v0.2.0
