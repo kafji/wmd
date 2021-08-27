@@ -47,7 +47,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_parse() {
-        let path = Path::new("./tpyo.example.toml");
+        let path = Path::new("./wmd.example.toml");
         let config = Configuration::from_path(path).await.unwrap();
 
         assert_eq!(config.url.to_string(), "http://127.0.0.1:39496/");
@@ -66,7 +66,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_parse_invalid_path() {
-        let path = Path::new("./typo.toml");
+        let path = Path::new("./cmd.toml");
         let error = Configuration::from_path(path).await.unwrap_err();
         assert!(matches!(error, Error::Io(_)));
     }
@@ -80,7 +80,7 @@ mod tests {
                 .unwrap();
             let path = {
                 let mut p = dir.path().to_owned();
-                p.push("tpyo.toml");
+                p.push("wmd.toml");
                 p
             };
             (dir, path)
