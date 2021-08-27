@@ -2,6 +2,8 @@
 
 ## [Unreleased](https://github.com/kafji/wmd/tree/master)
 
+## [0.2.0](https://github.com/kafji/wmd/tree/v0.2.0) - 2021-08-27
+
 - Breaking changes:
   - Add Apache 2.0 license option.
   - Rebrand project to wmd.
