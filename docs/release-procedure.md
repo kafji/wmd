@@ -2,16 +2,16 @@
 
 1. Stage environment.
 
-    1. Fetch latest changes in `origin/master`.
-
-        ```
-        git fetch origin/master
-        ```
-
-    2. Checkout to `master`.
+    1. Checkout to `master`.
 
         ```
         git checkout master
+        ```
+
+    2. Fetch latest changes in `origin/master`.
+
+        ```
+        git fetch origin master
         ```
 
     3. Ensure it is up to date with `origin/master` and there are no pending changes locally.
