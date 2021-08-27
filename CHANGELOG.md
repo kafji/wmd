@@ -2,6 +2,8 @@
 
 ## [Unreleased](https://github.com/kafji/tpyo/tree/master)
 
+- Add Apache 2.0 license option.
+
 ## [0.1.0](https://github.com/kafji/tpyo/tree/v0.1.0) - 2021-08-16
 
 - Initial release. Check [README.md](README.md) for more information.
