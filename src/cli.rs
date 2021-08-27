@@ -2,7 +2,7 @@ use argh::FromArgs;
 use std::path::PathBuf;
 
 #[derive(FromArgs, PartialEq, Debug)]
-/// Tpyo command line interface.
+/// wmd command line interface.
 pub struct Cli {
     #[argh(subcommand)]
     pub cmd: Subcommand,
@@ -15,15 +15,15 @@ pub enum Subcommand {
 }
 
 #[derive(FromArgs, PartialEq, Debug)]
-/// Start Tpyo web server.
+/// Start wmd web server.
 #[argh(subcommand, name = "serve")]
 pub struct Serve {
     #[argh(option, short = 'p', default = "39496")]
     /// port, default 39496
     pub port: u16,
 
-    #[argh(option, short = 'C', default = "PathBuf::from(\"./tpyo.toml\")")]
-    /// configuration file path, default "./tpyo.toml"
+    #[argh(option, short = 'c')]
+    /// configuration file path
     pub config: PathBuf,
 }
 

@@ -20,7 +20,7 @@
         git status
         ```
 
-2. Verify current revision builds are green on [https://github.com/kafji/tpyo](https://github.com/kafji/tpyo).
+2. Verify current revision builds are green on [https://github.com/kafji/wmd](https://github.com/kafji/wmd).
 
 3. Update documents.
 
@@ -33,9 +33,9 @@
     2. Update the changelog entries in [CHANGELOG.md](../CHANGELOG.md).
 
         ```
-        ## [0.2.0](https://github.com/kafji/tpyo/tree/v0.2.0) - 2021-12-31
+        ## [0.2.0](https://github.com/kafji/wmd/tree/v0.2.0) - 2021-12-31
 
-        - Tpyo can reload its configuration file without killing itself, similar to Nginx.
+        - Add a feature.
         ```
 
 4. Commit changes and create version tag.
@@ -58,4 +58,4 @@
 
 7. Publish binary on GitHub.
 
-    https://github.com/kafji/tpyo/releases/new?tag=v0.2.0&title=0.2.0
+    https://github.com/kafji/wmd/releases/new?tag=v0.2.0&title=0.2.0

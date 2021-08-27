@@ -1420,30 +1420,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "360dfd1d6d30e05fda32ace2c8c70e9c0a9da713275777f5a4dbb8a1893930c6"
 
 [[package]]
-name = "tpyo"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "argh",
- "assert_cmd",
- "async-trait",
- "indoc",
- "itertools",
- "pretty_assertions",
- "rand 0.8.4",
- "reqwest",
- "serde",
- "tempfile",
- "thiserror",
- "tokio",
- "toml",
- "tracing",
- "tracing-subscriber",
- "url",
- "warp",
-]
-
-[[package]]
 name = "tracing"
 version = "0.1.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1805,4 +1781,28 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0120db82e8a1e0b9fb3345a539c478767c0048d842860994d96113d5b667bd69"
 dependencies = [
  "winapi",
+]
+
+[[package]]
+name = "wmd"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "argh",
+ "assert_cmd",
+ "async-trait",
+ "indoc",
+ "itertools",
+ "pretty_assertions",
+ "rand 0.8.4",
+ "reqwest",
+ "serde",
+ "tempfile",
+ "thiserror",
+ "tokio",
+ "toml",
+ "tracing",
+ "tracing-subscriber",
+ "url",
+ "warp",
 ]

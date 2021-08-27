@@ -84,15 +84,15 @@ fn index(
             <html>
                 <head>
                     <meta charset="utf-8">
-                    <title>Tpyo</title>
+                    <title>wmd</title>
                     <link
                         rel="search"
                         href="/opensearch.xml"
                         type="application/opensearchdescription+xml"
-                        title="Tpyo">
+                        title="wmd">
                 </head>
                 <body>
-                    <h1>Tpyo</h1>
+                    <h1>wmd</h1>
                     <h2>Prefixes</h2>
                     <ul>
                         {targets}
@@ -118,7 +118,7 @@ fn open_search(
         let body = formatdoc! {r#"
                 <?xml version="1.0" encoding="utf-8"?>
                 <OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
-                    <ShortName>Tpyo</ShortName>
+                    <ShortName>wmd</ShortName>
                     <Description>Web search hub.</Description>
                     <Url type="text/html" template="{url}search?q={{searchTerms}}"/>
                 </OpenSearchDescription>
@@ -269,7 +269,7 @@ mod integration_tests {
     };
 
     async fn routes() -> impl Filter<Extract = impl Reply> + Clone {
-        let config = Configuration::from_path(Path::new("./tpyo.example.toml"))
+        let config = Configuration::from_path(Path::new("./wmd.example.toml"))
             .await
             .unwrap();
         let routes = super::routes(config);
@@ -294,15 +294,15 @@ mod integration_tests {
                 <html>
                     <head>
                         <meta charset="utf-8">
-                        <title>Tpyo</title>
+                        <title>wmd</title>
                         <link
                             rel="search"
                             href="/opensearch.xml"
                             type="application/opensearchdescription+xml"
-                            title="Tpyo">
+                            title="wmd">
                     </head>
                     <body>
-                        <h1>Tpyo</h1>
+                        <h1>wmd</h1>
                         <h2>Prefixes</h2>
                         <ul>
                             <li><b>rs</b> for The Rust Standard Library, <code>https://doc.rust-lang.org/std/index.html?search={keywords}</code></li><li><b>drx</b> for Docs.rs (direct), <code>https://docs.rs/{keywords}</code></li>
@@ -333,7 +333,7 @@ mod integration_tests {
             indoc! {r#"
                 <?xml version="1.0" encoding="utf-8"?>
                 <OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
-                    <ShortName>Tpyo</ShortName>
+                    <ShortName>wmd</ShortName>
                     <Description>Web search hub.</Description>
                     <Url type="text/html" template="http://127.0.0.1:39496/search?q={searchTerms}"/>
                 </OpenSearchDescription>

@@ -34,8 +34,8 @@ mod cli {
                 "serve",
                 "-p",
                 &port.to_string(),
-                "-C",
-                "./tpyo.example.toml",
+                "-c",
+                "./wmd.example.toml",
             ]);
             cmd.stdout(Stdio::null());
             let ps = cmd.spawn().unwrap();

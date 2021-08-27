@@ -1,4 +1,4 @@
-# Tpyo
+# wmd
 
 Web search shortcuts.
 

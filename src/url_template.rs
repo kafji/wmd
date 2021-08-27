@@ -84,7 +84,7 @@ mod url_templates_tests {
 
     #[tokio::test]
     async fn test_configuration() {
-        let path = Path::new("./tpyo.example.toml");
+        let path = Path::new("./wmd.example.toml");
         let config = Configuration::from_path(path).await.unwrap();
 
         let template = config.template_for("rs");
