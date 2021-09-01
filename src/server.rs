@@ -9,7 +9,6 @@ use serde::Deserialize;
 use std::{convert::TryInto, sync::Arc};
 use thiserror::Error;
 use tracing::debug;
-use url::Url;
 use warp::{
     get,
     http::{header::CONTENT_TYPE, HeaderValue, Response, Uri},
@@ -41,15 +40,6 @@ fn search_query() -> impl Filter<Extract = (SearchQuery,), Error = Rejection> + 
     })
 }
 
-fn build_search_url(base: &Url, q: &str) -> Url {
-    let mut url = base.clone();
-    url.set_path("search");
-    let mut query = url.query_pairs_mut();
-    query.append_pair("q", &q);
-    drop(query);
-    url
-}
-
 trait HtmlRepr {
     /// Returns HTML representation.
     fn repr(&self) -> String;
@@ -58,18 +48,9 @@ trait HtmlRepr {
 impl HtmlRepr for Vec<Target> {
     fn repr(&self) -> String {
         self.iter()
-            .map(
-                |Target {
-                     prefix,
-                     name,
-                     url_template,
-                 }| {
-                    format!(
-                        "<li><b>{}</b> for {}, <code>{}</code></li>",
-                        prefix, name, url_template
-                    )
-                },
-            )
+            .map(|Target { prefix, name, url_template }| {
+                format!("<li><b>{}</b> for {}, <code>{}</code></li>", prefix, name, url_template)
+            })
             .join("")
     }
 }
@@ -150,10 +131,9 @@ fn robots_txt() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone 
     let path = path("robots.txt").and(end());
     get().and(path).and_then(move || async move {
         let mut reply = Response::new(body);
-        reply.headers_mut().insert(
-            CONTENT_TYPE,
-            HeaderValue::from_static("text/plain; charset=utf-8"),
-        );
+        reply
+            .headers_mut()
+            .insert(CONTENT_TYPE, HeaderValue::from_static("text/plain; charset=utf-8"));
         Result::<_, Rejection>::Ok(reply)
     })
 }
@@ -162,85 +142,50 @@ fn search(
     config: Arc<Configuration>,
 ) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     let path = path("search").and(end());
-    get()
-        .and(path)
-        .and(search_query())
-        .and_then(move |query: SearchQuery| {
-            let config = config.clone();
-            async move {
-                let prefix = query.prefix();
-                let keywords = query.keywords();
+    get().and(path).and(search_query()).and_then(move |query: SearchQuery| {
+        let config = config.clone();
+        async move {
+            let prefix = query.prefix();
 
-                // todo(kfj): ugly (1/2)
-                let prefix = match prefix {
-                    Some(x) => x,
-                    None => {
-                        // Handle missing prefix.
-                        let default = config.default_template();
-                        return match default {
-                            Some(d) => {
-                                let q = format!("{} {}", d.prefix, keywords);
-                                let url = build_search_url(&config.url, &q);
-                                debug!(
-                                    { ?prefix, keywords, redirect_to = %url },
-                                    "redirecting to search with default template"
-                                );
-                                let url =
-                                    url.as_str().try_into().map_err(Into::<InvalidUri>::into)?;
-                                Ok(redirect::temporary(url))
-                            }
-                            None => {
-                                debug!({ ?prefix, keywords }, "template not found");
-                                Err(reject::not_found())
-                            }
-                        };
+            // get query keywords by checking prefix
+            let keywords: &str = match prefix {
+                Some(prefix) => {
+                    // check if query prefix is known
+                    let known_prefix = config.has_template_for(prefix);
+                    if known_prefix {
+                        query.keywords()
+                    } else {
+                        // if not treat prefix as keywords
+                        &query.query
                     }
-                };
+                }
+                None => query.keywords(),
+            };
 
-                // todo(kfj): ugly (2/2)
-                let template = {
-                    let t = config.template_for(prefix);
-                    match t {
-                        Some(x) => x,
-                        None => {
-                            // Handle unknown prefix.
-                            let default = config.default_template();
-                            return match default {
-                                Some(d) => {
-                                    let q = format!("{} {}", d.prefix, query.query);
-                                    let url = build_search_url(&config.url, &q);
-                                    debug!(
-                                        { ?prefix, keywords, redirect_to = %url },
-                                        "unknown prefix, treating it as keywords. redirecting to search with default template"
-                                    );
-                                    let url: Uri = url
-                                        .as_str()
-                                        .try_into()
-                                        .map_err(Into::<InvalidUri>::into)?;
-                                    Ok(redirect::temporary(url))
-                                }
-                                None => {
-                                    debug!(
-                                        { ?prefix, keywords },
-                                        "unknown prefix, instance has no target. template not found"
-                                    );
-                                    Err(reject::not_found())},
-                            };
-                        }
-                    }
-                };
+            // get template
+            let template = prefix
+                .map(|x| config.template_for(x))
+                .flatten()
+                .or_else(|| config.default_template());
 
-                let url = template.build_url(keywords)?;
-                debug!(
-                    { ?prefix, keywords, ?template, redirect_url = url.as_str() },
-                    "redirecting to target"
-                );
-
-                let url =  url.as_str().try_into().map_err(Into::<InvalidUri>::into)?;
-                let reply = redirect::temporary(url);
-                Result::<_, Rejection>::Ok(reply)
+            match template {
+                None => {
+                    // found no matching template
+                    // serve 404
+                    Err(reject::not_found())
+                }
+                Some(template) => {
+                    // found matching template
+                    // build url
+                    let url = template.build_url(keywords)?;
+                    // build uri....
+                    let url: Uri = url.as_str().try_into().map_err(Into::<InvalidUri>::into)?;
+                    // serve redirect
+                    Ok(redirect::temporary(url))
+                }
             }
-        })
+        }
+    })
 }
 
 fn routes(config: Configuration) -> impl Filter<Extract = impl Reply> + Clone {
@@ -269,9 +214,7 @@ mod integration_tests {
     };
 
     async fn routes() -> impl Filter<Extract = impl Reply> + Clone {
-        let config = Configuration::from_path(Path::new("./wmd.example.toml"))
-            .await
-            .unwrap();
+        let config = Configuration::from_path(Path::new("./wmd.example.toml")).await.unwrap();
         let routes = super::routes(config);
         routes
     }
@@ -283,10 +226,7 @@ mod integration_tests {
         let resp = request().method("GET").path("/").reply(&routes).await;
 
         assert_eq!(resp.status(), StatusCode::OK);
-        assert_eq!(
-            resp.headers().get(CONTENT_TYPE).unwrap(),
-            "text/html; charset=utf-8"
-        );
+        assert_eq!(resp.headers().get(CONTENT_TYPE).unwrap(), "text/html; charset=utf-8");
         assert_eq!(
             resp.body(),
             indoc! {r#"
@@ -317,11 +257,7 @@ mod integration_tests {
     async fn test_get_opensearch() {
         let routes = routes().await;
 
-        let resp = request()
-            .method("GET")
-            .path("/opensearch.xml")
-            .reply(&routes)
-            .await;
+        let resp = request().method("GET").path("/opensearch.xml").reply(&routes).await;
 
         assert_eq!(resp.status(), StatusCode::OK);
         assert_eq!(
@@ -345,64 +281,50 @@ mod integration_tests {
     async fn test_get_search() {
         let routes = routes().await;
 
-        let resp = request()
-            .method("GET")
-            .path("/search?q=rs+result")
-            .reply(&routes)
-            .await;
+        let resp = request().method("GET").path("/search?q=rs+result").reply(&routes).await;
 
         assert_eq!(resp.status(), StatusCode::TEMPORARY_REDIRECT);
         assert_eq!(
-            resp.headers()
-                .get(http::header::LOCATION)
-                .map(|x| x.to_str())
-                .unwrap()
-                .unwrap(),
+            resp.headers().get(http::header::LOCATION).map(|x| x.to_str()).unwrap().unwrap(),
             "https://doc.rust-lang.org/std/index.html?search=result"
         );
     }
 
     #[tokio::test]
     async fn test_get_search_without_prefix() {
+        // On receiving search request without prefix
+        // if there's default url template, serve redirect to url built with default url template
+        // otherwise serve 404.
+
+        // todo(kfj): missing test for 404.
+
         let routes = routes().await;
 
-        let resp = request()
-            .method("GET")
-            .path("/search?q=result")
-            .reply(&routes)
-            .await;
+        let resp = request().method("GET").path("/search?q=result").reply(&routes).await;
 
         assert_eq!(resp.status(), StatusCode::TEMPORARY_REDIRECT);
-        // todo(kfj): redirect to search target instead?
         assert_eq!(
-            resp.headers()
-                .get(http::header::LOCATION)
-                .map(|x| x.to_str())
-                .unwrap()
-                .unwrap(),
-            "http://127.0.0.1:39496/search?q=rs+result"
+            resp.headers().get(http::header::LOCATION).map(|x| x.to_str()).unwrap().unwrap(),
+            "https://doc.rust-lang.org/std/index.html?search=result"
         );
     }
 
     #[tokio::test]
     async fn test_get_search_with_unknown_prefix() {
+        // On receiving request with unknown prefix
+        // treat the unknown prefix as keywords for default url template
+        // if there's no default template, serve 404.
+
+        // todo(kfj): missing test for 404.
+
         let routes = routes().await;
 
-        let resp = request()
-            .method("GET")
-            .path("/search?q=gg+result")
-            .reply(&routes)
-            .await;
+        let resp = request().method("GET").path("/search?q=gg+result").reply(&routes).await;
 
         assert_eq!(resp.status(), StatusCode::TEMPORARY_REDIRECT);
-        // todo(kfj): redirect to search target instead?
         assert_eq!(
-            resp.headers()
-                .get(http::header::LOCATION)
-                .map(|x| x.to_str())
-                .unwrap()
-                .unwrap(),
-            "http://127.0.0.1:39496/search?q=rs+gg+result"
+            resp.headers().get(http::header::LOCATION).map(|x| x.to_str()).unwrap().unwrap(),
+            "https://doc.rust-lang.org/std/index.html?search=gg%20result"
         );
     }
 
@@ -410,17 +332,10 @@ mod integration_tests {
     async fn test_get_robots_txt() {
         let routes = routes().await;
 
-        let resp = request()
-            .method("GET")
-            .path("/robots.txt")
-            .reply(&routes)
-            .await;
+        let resp = request().method("GET").path("/robots.txt").reply(&routes).await;
 
         assert_eq!(resp.status(), StatusCode::OK);
-        assert_eq!(
-            resp.headers().get(CONTENT_TYPE).unwrap(),
-            "text/plain; charset=utf-8"
-        );
+        assert_eq!(resp.headers().get(CONTENT_TYPE).unwrap(), "text/plain; charset=utf-8");
         assert_eq!(
             resp.body(),
             indoc! {"

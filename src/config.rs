@@ -41,7 +41,6 @@ impl Configuration {
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
     use tokio::{fs::File, io::AsyncWriteExt, task::spawn_blocking};
 
@@ -58,10 +57,7 @@ mod tests {
         let tgt = &targets[0];
         assert_eq!(tgt.prefix, "rs");
         assert_eq!(tgt.name, "The Rust Standard Library");
-        assert_eq!(
-            tgt.url_template,
-            "https://doc.rust-lang.org/std/index.html?search={keywords}"
-        );
+        assert_eq!(tgt.url_template, "https://doc.rust-lang.org/std/index.html?search={keywords}");
     }
 
     #[tokio::test]
@@ -74,10 +70,7 @@ mod tests {
     #[tokio::test]
     async fn test_parse_malformat() {
         let (_dir, path) = {
-            let dir = spawn_blocking(|| tempfile::tempdir())
-                .await
-                .unwrap()
-                .unwrap();
+            let dir = spawn_blocking(|| tempfile::tempdir()).await.unwrap().unwrap();
             let path = {
                 let mut p = dir.path().to_owned();
                 p.push("wmd.toml");
