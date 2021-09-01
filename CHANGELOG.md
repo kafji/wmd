@@ -2,6 +2,10 @@
 
 ## [Unreleased](https://github.com/kafji/wmd/tree/master)
 
+## [0.2.1](https://github.com/kafji/wmd/tree/v0.2.1) - 2021-09-01
+
+- Set max log level to info.
+
 ## [0.2.0](https://github.com/kafji/wmd/tree/v0.2.0) - 2021-08-27
 
 - Breaking changes:
