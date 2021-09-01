@@ -17,17 +17,8 @@ pub struct UrlTemplate<'a> {
 
 impl<'a> From<&'a Target> for UrlTemplate<'a> {
     fn from(s: &'a Target) -> Self {
-        let Target {
-            prefix,
-            name,
-            url_template: template,
-            ..
-        } = s;
-        Self {
-            prefix,
-            name,
-            template,
-        }
+        let Target { prefix, name, url_template: template, .. } = s;
+        Self { prefix, name, template }
     }
 }
 
@@ -42,7 +33,6 @@ impl UrlTemplate<'_> {
 
 #[cfg(test)]
 mod url_template_tests {
-
     use super::*;
 
     #[test]
@@ -61,18 +51,21 @@ pub trait UrlTemplates<'a> {
     fn template_for(&'a self, prefix: &str) -> Option<UrlTemplate<'a>>;
 
     fn default_template(&'a self) -> Option<UrlTemplate<'a>>;
+
+    fn has_template_for(&'a self, prefix: &str) -> bool;
 }
 
 impl<'a> UrlTemplates<'a> for Configuration {
     fn template_for(&'a self, prefix: &str) -> Option<UrlTemplate<'a>> {
-        self.targets
-            .iter()
-            .find(|Target { prefix: x, .. }| x == prefix)
-            .map(Into::into)
+        self.targets.iter().find(|Target { prefix: x, .. }| x == prefix).map(Into::into)
     }
 
     fn default_template(&'a self) -> Option<UrlTemplate<'a>> {
         self.targets.first().map(Into::into)
+    }
+
+    fn has_template_for(&'a self, prefix: &str) -> bool {
+        self.targets.iter().find(|Target { prefix: x, .. }| x == prefix).is_some()
     }
 }
 
@@ -100,5 +93,14 @@ mod url_templates_tests {
 
         let template = config.template_for("gg");
         assert_eq!(template, None);
+    }
+
+    #[tokio::test]
+    async fn test_has_template_for() {
+        let path = Path::new("./wmd.example.toml");
+        let templates = Configuration::from_path(path).await.unwrap();
+
+        assert_eq!(templates.has_template_for("rs"), true);
+        assert_eq!(templates.has_template_for("gg"), false);
     }
 }
