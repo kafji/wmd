@@ -1,3 +1,9 @@
+mod cli;
+mod config;
+mod search_query;
+mod server;
+mod url_template;
+
 use crate::{
     cli::{Serve, Subcommand},
     config::Configuration,
@@ -7,17 +13,11 @@ use std::net::SocketAddr;
 use tracing::{debug, info};
 use tracing_subscriber::EnvFilter;
 
-mod cli;
-mod config;
-mod search_query;
-mod server;
-mod url_template;
-
 async fn serve(cmd: &Serve) -> Result<()> {
     let cfg = Configuration::from_path(&cmd.config).await?;
     debug!(?cfg, "starting");
 
-    let addr: SocketAddr = ([127, 0, 0, 1], cmd.port).into();
+    let addr: SocketAddr = ([0, 0, 0, 0], cmd.port).into();
     info!(?addr, "start listening");
 
     server::server(cfg).bind(addr).await;
@@ -26,18 +26,28 @@ async fn serve(cmd: &Serve) -> Result<()> {
 }
 
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() {
     tracing_subscriber::fmt()
         .with_env_filter(EnvFilter::from_default_env())
+        .with_thread_ids(true)
         .init();
 
     let cmd = cli::cmd();
     debug!(?cmd, "launched");
 
-    match cmd.cmd {
-        Subcommand::Serve(cmd) => serve(&cmd).await?,
+    if cmd.version {
+        println!("{}", env!("CARGO_PKG_VERSION"));
+        return;
+    }
+
+    if let None = cmd.cmd {
+        println!("expecting a command, was none");
+        return;
+    }
+
+    match cmd.cmd.unwrap() {
+        Subcommand::Serve(cmd) => serve(&cmd).await.unwrap(),
     };
 
     info!("exiting");
-    Ok(())
 }

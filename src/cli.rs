@@ -5,7 +5,11 @@ use std::path::PathBuf;
 /// wmd command line interface.
 pub struct Cli {
     #[argh(subcommand)]
-    pub cmd: Subcommand,
+    pub cmd: Option<Subcommand>,
+
+    /// print version
+    #[argh(switch)]
+    pub version: bool,
 }
 
 #[derive(FromArgs, PartialEq, Debug)]

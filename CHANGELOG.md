@@ -2,7 +2,14 @@
 
 ## [Unreleased](https://github.com/kafji/wmd/tree/master)
 
+Changes:
+
+- Add `--version` flag
+- wmd server now bind to all ip addresses instead of localhost
+
 ## [0.2.1](https://github.com/kafji/wmd/tree/v0.2.1) - 2021-09-01
+
+Changes:
 
 - Set max log level to info.
 
@@ -13,6 +20,8 @@
   - Rebrand project to wmd.
 
 ## [0.1.0](https://github.com/kafji/wmd/tree/v0.1.0) - 2021-08-16
+
+Changes:
 
 - Initial release. Check [README.md](README.md) for more information.
 
