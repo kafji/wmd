@@ -4,8 +4,9 @@
 
 Changes:
 
-- Add `--version` flag
-- wmd server now bind to all ip addresses instead of localhost
+- Add `--version` flag.
+- wmd server now bind to all ip addresses instead of localhost.
+- Faster URL template lookup.
 
 ## [0.2.1](https://github.com/kafji/wmd/tree/v0.2.1) - 2021-09-01
 

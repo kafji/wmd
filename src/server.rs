@@ -1,7 +1,7 @@
 use crate::{
     config::{Configuration, Target},
     search_query::SearchQuery,
-    url_template::{Error as UrlTemplateError, UrlTemplates},
+    url_template::{Error as UrlTemplateError, ResolveUrlTemplate, UrlTemplates},
 };
 use indoc::{formatdoc, indoc};
 use itertools::Itertools;
@@ -56,7 +56,7 @@ impl HtmlRepr for Vec<Target> {
 }
 
 fn index(
-    config: Arc<Configuration>,
+    ctx: Arc<RequestsContext>,
 ) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     let path = end();
     get().and(path).and_then(move || {
@@ -81,7 +81,7 @@ fn index(
                 </body>
             </html>
             "#,
-            targets = config.targets.repr(),
+            targets = ctx.config.targets.repr(),
         };
         async move {
             let body = body.clone();
@@ -92,7 +92,7 @@ fn index(
 }
 
 fn open_search(
-    config: Arc<Configuration>,
+    ctx: Arc<RequestsContext>,
 ) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     let path = path("opensearch.xml").and(end());
     get().and(path).and_then(move || {
@@ -104,7 +104,7 @@ fn open_search(
                     <Url type="text/html" template="{url}search?q={{searchTerms}}"/>
                 </OpenSearchDescription>
             "#,
-            url = &config.url
+            url = &ctx.config.url
         };
         async move {
             let reply = {
@@ -139,11 +139,11 @@ fn robots_txt() -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone 
 }
 
 fn search(
-    config: Arc<Configuration>,
+    ctx: Arc<RequestsContext>,
 ) -> impl Filter<Extract = impl Reply, Error = Rejection> + Clone {
     let path = path("search").and(end());
     get().and(path).and(search_query()).and_then(move |query: SearchQuery| {
-        let config = config.clone();
+        let ctx = ctx.clone();
         async move {
             let prefix = query.prefix();
 
@@ -151,7 +151,7 @@ fn search(
             let keywords: &str = match prefix {
                 Some(prefix) => {
                     // check if query prefix is known
-                    let known_prefix = config.has_template_for(prefix);
+                    let known_prefix = ctx.templates.has_template_for(prefix);
                     if known_prefix {
                         query.keywords()
                     } else {
@@ -164,9 +164,9 @@ fn search(
 
             // get template
             let template = prefix
-                .map(|x| config.template_for(x))
+                .map(|x| ctx.templates.template_for(x))
                 .flatten()
-                .or_else(|| config.default_template());
+                .or_else(|| ctx.templates.default_template());
 
             match template {
                 None => {
@@ -188,12 +188,27 @@ fn search(
     })
 }
 
+/// Request handlers shareable objects container.
+#[derive(Debug)]
+struct RequestsContext {
+    config: Configuration,
+    templates: UrlTemplates,
+}
+
+impl RequestsContext {
+    fn new(config: Configuration) -> Arc<Self> {
+        let templates = UrlTemplates::new(&config);
+        let s = Self { config, templates };
+        Arc::new(s)
+    }
+}
+
 fn routes(config: Configuration) -> impl Filter<Extract = impl Reply> + Clone {
-    let config = Arc::new(config);
-    index(config.clone())
-        .or(open_search(config.clone()))
+    let ctx = RequestsContext::new(config);
+    index(ctx.clone())
+        .or(open_search(ctx.clone()))
         .or(robots_txt())
-        .or(search(config.clone()))
+        .or(search(ctx.clone()))
         .with(warp::trace::request())
 }
 
