@@ -44,7 +44,6 @@ jobs:
             ghcr.io/kafji/wmd
           tags: |
             type=edge
-            type=ref,event=branch
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{version}}
 
