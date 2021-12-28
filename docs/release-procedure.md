@@ -2,25 +2,13 @@
 
 1. Stage environment.
 
-    1. Checkout to `master`.
+    1. Ensure current local revision is up to date with `origin/master` and there are no pending changes.
 
         ```
-        git checkout master
+        git checkout master && git fetch origin master && git status
         ```
 
-    2. Fetch latest changes in `origin/master`.
-
-        ```
-        git fetch origin master
-        ```
-
-    3. Ensure it is up to date with `origin/master` and there are no pending changes locally.
-
-        ```
-        git status
-        ```
-
-2. Verify current revision builds are green on [https://github.com/kafji/wmd](https://github.com/kafji/wmd).
+2. Verify current revision build is green on [https://github.com/kafji/wmd](https://github.com/kafji/wmd).
 
 3. Update documents.
 
@@ -50,12 +38,6 @@
     git push origin master && git push --tags origin
     ```
 
-6. Build binary.
+6. Create release on GitHub.
 
-    ```
-    cargo build --release
-    ```
-
-7. Publish binary on GitHub.
-
-    https://github.com/kafji/wmd/releases/new?tag=v0.2.0
+    https://github.com/kafji/wmd/releases/new?tag=v0.2.0&body=```%0Adocker pull ghcr.io/kafji/wmd:0.2%0A```
