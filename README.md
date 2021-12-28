@@ -9,7 +9,7 @@ Web search shortcuts.
 ```bash
 docker pull ghcr.io/kafji/wmd
 docker run -p 4000:80 ghcr.io/kafji/wmd
-xdg-open http://127.0.0.1:4000/search?q=lrx+tokio
+xdg-open http://127.0.0.1:4000/search?q=drx+tokio
 ```
 
 ## License & Contribution
