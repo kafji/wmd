@@ -44,8 +44,6 @@ jobs:
             ghcr.io/kafji/wmd
           tags: |
             type=edge
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{version}}
 
       - uses: docker/login-action@v1
         with:
