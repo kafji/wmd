@@ -2,6 +2,10 @@
 
 ## [Unreleased](https://github.com/kafji/wmd/tree/master)
 
+Breaking changes:
+
+- Allow logging level lower than info.
+
 ## [0.2.2](https://github.com/kafji/wmd/tree/v0.2.2) - 2021-09-01
 
 Changes:
