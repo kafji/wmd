@@ -104,7 +104,7 @@ fn open_search(
                     <Url type="text/html" template="{url}search?q={{searchTerms}}"/>
                 </OpenSearchDescription>
             "#,
-            url = &ctx.config.url
+            url = &ctx.config.base_url
         };
         async move {
             let reply = {
@@ -286,7 +286,7 @@ mod integration_tests {
                 <OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
                     <ShortName>wmd</ShortName>
                     <Description>Web search hub.</Description>
-                    <Url type="text/html" template="http://127.0.0.1:39496/search?q={searchTerms}"/>
+                    <Url type="text/html" template="http://127.0.0.1:8000/search?q={searchTerms}"/>
                 </OpenSearchDescription>
             "#}
         );

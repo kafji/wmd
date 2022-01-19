@@ -1,5 +1,5 @@
 # used to generate open search description
-url = "http://127.0.0.1:39496/"
+base_url = "http://127.0.0.1:8000/"
 
 [[targets]]
 prefix = "rs"

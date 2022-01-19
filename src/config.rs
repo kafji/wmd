@@ -6,7 +6,7 @@ use url::Url;
 
 #[derive(Deserialize, PartialEq, Clone, Debug)]
 pub struct Configuration {
-    pub url: Url,
+    pub base_url: Url,
     pub privacy_policy: Option<Url>,
     pub targets: Vec<Target>,
 }
@@ -49,7 +49,7 @@ mod tests {
         let path = Path::new("./wmd.example.toml");
         let config = Configuration::from_path(path).await.unwrap();
 
-        assert_eq!(config.url.to_string(), "http://127.0.0.1:39496/");
+        assert_eq!(config.base_url.to_string(), "http://127.0.0.1:8000/");
 
         let targets = config.targets;
         assert_eq!(targets.len(), 2);
