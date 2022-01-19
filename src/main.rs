@@ -1,7 +1,7 @@
 mod cli;
 mod config;
 mod search_query;
-mod server;
+mod http_server;
 mod url_template;
 
 use crate::{
@@ -14,13 +14,20 @@ use tracing::{debug, info};
 use tracing_subscriber::EnvFilter;
 
 async fn serve(cmd: &Serve) -> Result<()> {
-    let cfg = Configuration::from_path(&cmd.config).await?;
+    let cfg = {
+        let base64 = std::env::var("WMD_CONFIG").ok();
+        if let Some(s) = base64 {
+            Configuration::from_base64(&s)
+        } else {
+            Configuration::from_path(&cmd.config).await
+        }
+    }?;
     debug!(?cfg, "starting");
 
     let addr: SocketAddr = ([0, 0, 0, 0], cmd.port).into();
     info!(?addr, "start listening");
 
-    server::server(cfg).bind(addr).await;
+    http_server::create_server(cfg).bind(addr).await;
 
     Ok(())
 }

@@ -8,6 +8,7 @@ publish = false
 anyhow = "1"
 argh = "0.1"
 async-trait = "0.1"
+base64 = "0.13"
 indoc = "1"
 itertools = "0.10"
 serde = { version = "1", features = ["derive"] }
@@ -15,7 +16,7 @@ thiserror = "1"
 tokio = { version = "1", features = ["full"] }
 toml = "0.5"
 tracing = { version = "0.1" }
-tracing-subscriber = "0.2"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 url = { version = "2", features = ["serde"] }
 warp = "0.3"
 

@@ -65,15 +65,15 @@ fn index(
             <html>
                 <head>
                     <meta charset="utf-8">
-                    <title>wmd</title>
+                    <title>WMD</title>
                     <link
                         rel="search"
                         href="/opensearch.xml"
                         type="application/opensearchdescription+xml"
-                        title="wmd">
+                        title="WMD">
                 </head>
                 <body>
-                    <h1>wmd</h1>
+                    <h1>WMD</h1>
                     <h2>Prefixes</h2>
                     <ul>
                         {targets}
@@ -104,7 +104,7 @@ fn open_search(
                     <Url type="text/html" template="{url}search?q={{searchTerms}}"/>
                 </OpenSearchDescription>
             "#,
-            url = &ctx.config.url
+            url = &ctx.config.base_url
         };
         async move {
             let reply = {
@@ -212,14 +212,15 @@ fn routes(config: Configuration) -> impl Filter<Extract = impl Reply> + Clone {
         .with(warp::trace::request())
 }
 
-pub fn server(config: Configuration) -> warp::Server<impl Filter<Extract = impl Reply> + Clone> {
+pub fn create_server(
+    config: Configuration,
+) -> warp::Server<impl Filter<Extract = impl Reply> + Clone> {
     let routes = routes(config);
     warp::serve(routes)
 }
 
 #[cfg(test)]
 mod integration_tests {
-
     use super::*;
     use pretty_assertions::assert_eq;
     use std::path::Path;
@@ -249,15 +250,15 @@ mod integration_tests {
                 <html>
                     <head>
                         <meta charset="utf-8">
-                        <title>wmd</title>
+                        <title>WMD</title>
                         <link
                             rel="search"
                             href="/opensearch.xml"
                             type="application/opensearchdescription+xml"
-                            title="wmd">
+                            title="WMD">
                     </head>
                     <body>
-                        <h1>wmd</h1>
+                        <h1>WMD</h1>
                         <h2>Prefixes</h2>
                         <ul>
                             <li><b>rs</b> for The Rust Standard Library, <code>https://doc.rust-lang.org/std/index.html?search={keywords}</code></li><li><b>drx</b> for Docs.rs (direct), <code>https://docs.rs/{keywords}</code></li>
@@ -286,7 +287,7 @@ mod integration_tests {
                 <OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
                     <ShortName>wmd</ShortName>
                     <Description>Web search hub.</Description>
-                    <Url type="text/html" template="http://127.0.0.1:39496/search?q={searchTerms}"/>
+                    <Url type="text/html" template="http://127.0.0.1:8000/search?q={searchTerms}"/>
                 </OpenSearchDescription>
             "#}
         );

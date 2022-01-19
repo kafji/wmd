@@ -22,8 +22,8 @@ pub enum Subcommand {
 /// Start wmd web server.
 #[argh(subcommand, name = "serve")]
 pub struct Serve {
-    #[argh(option, short = 'p', default = "39496")]
-    /// port, default 39496
+    #[argh(option, short = 'p', default = "8000")]
+    /// port, default 8000
     pub port: u16,
 
     #[argh(option, short = 'c')]
