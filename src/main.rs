@@ -1,7 +1,7 @@
 mod cli;
 mod config;
 mod search_query;
-mod server;
+mod http_server;
 mod url_template;
 
 use crate::{
@@ -27,7 +27,7 @@ async fn serve(cmd: &Serve) -> Result<()> {
     let addr: SocketAddr = ([0, 0, 0, 0], cmd.port).into();
     info!(?addr, "start listening");
 
-    server::server(cfg).bind(addr).await;
+    http_server::create_server(cfg).bind(addr).await;
 
     Ok(())
 }

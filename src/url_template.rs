@@ -117,7 +117,7 @@ mod resolve_url_template_tests {
         let config = Configuration::from_path(path).await.unwrap();
         let templates: UrlTemplates = UrlTemplates::new(&config);
 
-        assert_eq!(templates.has_template_for("rs"), true);
-        assert_eq!(templates.has_template_for("gg"), false);
+        assert!(templates.has_template_for("rs"));
+        assert!(!templates.has_template_for("gg"));
     }
 }
