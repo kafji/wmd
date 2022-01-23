@@ -8,6 +8,7 @@ publish = false
 anyhow = "1"
 argh = "0.1"
 async-trait = "0.1"
+base64 = "0.13"
 indoc = "1"
 itertools = "0.10"
 serde = { version = "1", features = ["derive"] }

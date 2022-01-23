@@ -1708,6 +1708,7 @@ dependencies = [
  "argh",
  "assert_cmd",
  "async-trait",
+ "base64",
  "indoc",
  "itertools",
  "pretty_assertions",

@@ -14,7 +14,14 @@ use tracing::{debug, info};
 use tracing_subscriber::EnvFilter;
 
 async fn serve(cmd: &Serve) -> Result<()> {
-    let cfg = Configuration::from_path(&cmd.config).await?;
+    let cfg = {
+        let base64 = std::env::var("WMD_CONFIG").ok();
+        if let Some(s) = base64 {
+            Configuration::from_base64(&s)
+        } else {
+            Configuration::from_path(&cmd.config).await
+        }
+    }?;
     debug!(?cfg, "starting");
 
     let addr: SocketAddr = ([0, 0, 0, 0], cmd.port).into();
