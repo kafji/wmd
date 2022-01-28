@@ -3,12 +3,13 @@ app = "wmd"
 [build]
 image = "registry.fly.io/wmd:edge"
 
-[deploy]
-strategy = "bluegreen"
-
 [[services]]
 internal_port = 80
 protocol = "tcp"
+
+[[services.ports]]
+handlers = ["http"]
+port = 80
 
 [[services.ports]]
 handlers = ["tls", "http"]
