@@ -2,7 +2,7 @@ use argh::FromArgs;
 use std::path::PathBuf;
 
 #[derive(FromArgs, PartialEq, Debug)]
-/// wmd command line interface.
+/// WMD command line interface.
 pub struct Cli {
     #[argh(subcommand)]
     pub cmd: Option<Subcommand>,
