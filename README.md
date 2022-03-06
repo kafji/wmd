@@ -1,4 +1,4 @@
-# WMD
+# Wmd
 
 Web search shortcuts.
 
