@@ -5,14 +5,21 @@ edition = "2021"
 publish = false
 
 [dependencies]
-anyhow = "1.0"
+anyhow = { version = "1.0", features = ["backtrace"] }
 argh = "0.1"
 async-trait = "0.1"
+axum = "0.5"
 base64 = "0.13"
+clap = { version = "3.1", default-features = false, features = [
+  "std",
+  "derive",
+  "cargo",
+] }
 indoc = "1.0"
 itertools = "0.10"
 serde = { version = "1.0", features = ["derive"] }
 thiserror = "1.0"
+tinytemplate = "1.2"
 tokio = { version = "1.7", features = ["full"] }
 toml = "0.5"
 tracing = { version = "0.1" }
