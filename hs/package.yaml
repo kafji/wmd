@@ -1,0 +1,51 @@
+name: wmd
+version: 0.1.0.0
+github: "kafji/wmd"
+license: MIT
+author: "Kafji"
+maintainer: "k@kafji.net"
+copyright: "2022 Kafji"
+
+extra-source-files:
+  - README.md
+  - ChangeLog.md
+
+dependencies:
+  - base >= 4.7 && < 5
+  - blaze-html
+  - bytestring
+  - containers
+  - htoml-megaparsec
+  - scotty
+  - text
+  - unordered-containers
+  - wai
+  - warp
+
+library:
+  source-dirs: src
+
+executables:
+  wmd-hs-exe:
+    main: Main.hs
+    source-dirs: app
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+    dependencies:
+      - wmd
+    when:
+      - condition: false
+        other-modules: Paths_wmd
+
+tests:
+  wmd-test:
+    main: Spec.hs
+    source-dirs: test
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+    dependencies:
+      - wmd
