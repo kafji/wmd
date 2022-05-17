@@ -142,11 +142,5 @@ pub async fn get_opensearch_xml(Extension(env): Extension<Env>) -> Reply {
 
 #[cfg_attr(debug_assertions, debug_handler)]
 pub async fn get_robots_txt(Extension(env): Extension<Env>) -> Reply {
-    reply_with_text!(
-        env.templates(),
-        RobotsTxt,
-        &json!({
-            "base_url": env.base_url(),
-        })
-    )
+    reply_with_text!(env.templates(), RobotsTxt, &())
 }
