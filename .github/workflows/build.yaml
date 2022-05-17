@@ -51,7 +51,7 @@ jobs:
           password: ${{ secrets.FLY_API_TOKEN }}
 
       - id: image-metadata
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v4
         with:
           images: |
             ghcr.io/kafji/wmd
