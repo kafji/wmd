@@ -12,7 +12,7 @@ struct Inner {
     default: Box<dyn (Fn(&str) -> String) + Send + Sync>,
     registry: HashMap<
         String,                                      /* prefix */
-        Box<dyn (Fn(&str) -> String) + Send + Sync>, /* generator */
+        Box<dyn (Fn(&str) -> String) + Send + Sync>, /* factory */
     >,
 }
 
@@ -31,10 +31,10 @@ impl TargetUrlMaker {
         let registry = targets
             .iter()
             .cloned()
-            .map(|t| {
+            .map(|tgt| {
                 let f: Box<dyn Fn(&str) -> String + Send + Sync> =
-                    Box::new(move |kw| t.url_template.replace("{keywords}", kw));
-                (t.prefix, f)
+                    Box::new(move |kw| tgt.url_template.replace("{keywords}", kw));
+                (tgt.prefix, f)
             })
             .collect::<HashMap<_, _>>();
         let s = Self {
@@ -49,7 +49,7 @@ impl TargetUrlMaker {
             .prefix
             .and_then(|prefix| {
                 let reg = &self.inner.registry;
-                reg.get(prefix).map(|g| g(query.keywords.as_str()))
+                reg.get(prefix).map(|f| f(query.keywords.as_str()))
             })
             .unwrap_or_else(|| (self.inner.default)(query.keywords.as_str()));
         Url::parse(&url).map_err(Error::new)
