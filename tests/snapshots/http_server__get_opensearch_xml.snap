@@ -1,0 +1,12 @@
+---
+source: tests/http_server.rs
+assertion_line: 80
+expression: body
+---
+<?xml version="1.0" encoding="utf-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+  <ShortName>Wmd</ShortName>
+  <Description>Web commands.</Description>
+  <Url type="text/html" template="http://127.0.0.1:3000//search?q={searchTerms}" />
+</OpenSearchDescription>
+
