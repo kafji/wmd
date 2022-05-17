@@ -30,6 +30,9 @@ jobs:
           restore-keys: |
             cargo-${{ runner.os }}
 
+      - name: Test
+        run: cargo test
+
       - name: Build
         run: cargo build --release
 
