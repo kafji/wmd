@@ -87,18 +87,29 @@ impl IntoResponse for Error {
     }
 }
 
+#[derive(Debug, Deserialize)]
+pub struct IndexParams {
+    q: Option<String>,
+}
+
 #[cfg_attr(debug_assertions, axum_macros::debug_handler)]
-pub async fn get_index(Extension(env): Extension<Env>) -> Reply {
-    reply_with_html!(env.templates(), HomePageHtml, &())
+pub async fn get_index(Query(params): Query<IndexParams>, Extension(env): Extension<Env>) -> Reply {
+    reply_with_html!(
+        env.templates(),
+        HomePageHtml,
+        &json!({
+            "query": params.q,
+        })
+    )
 }
 
 #[derive(Debug, Deserialize)]
-pub struct QueryParams {
+pub struct SearchParams {
     q: String,
 }
 
 pub async fn get_search(
-    Query(params): Query<QueryParams>,
+    Query(params): Query<SearchParams>,
     Extension(env): Extension<Env>,
 ) -> Reply {
     let query = parse_search_query(&params.q);

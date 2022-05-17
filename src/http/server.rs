@@ -2,6 +2,7 @@ use super::{env::Env, handlers::*};
 use anyhow::Error;
 use axum::{routing::get, Extension, Router, Server};
 use tower_http::trace::TraceLayer;
+use tracing::info;
 
 pub fn router(env: Env) -> Router {
     Router::new()
@@ -17,6 +18,7 @@ pub fn router(env: Env) -> Router {
 pub async fn start(port: u16, env: Env) -> Result<(), Error> {
     let app = router(env).layer(TraceLayer::new_for_http());
     let addr = ([0, 0, 0, 0], port).into();
+    info!(?addr, "starting server");
     Server::bind(&addr).serve(app.into_make_service()).await?;
     Ok(())
 }

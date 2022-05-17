@@ -1,6 +1,6 @@
 ---
 source: tests/http_server.rs
-assertion_line: 65
+assertion_line: 74
 expression: body
 ---
 <!DOCTYPE html>
@@ -15,7 +15,7 @@ expression: body
 <body>
   <p>
   <form method="GET" action="/search">
-    <input type="text" name="q" value="">
+    <input type="text" name="q" value="hello">
     <button>Go</button>
   </form>
   </p>

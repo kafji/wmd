@@ -21,7 +21,7 @@ struct Inner {
 impl Env {
     pub fn new(base_url: Url, search_targets: Vec<SearchTarget>) -> Result<Self, Error> {
         let templates = create_templates()?;
-        let url_maker = TargetUrlMaker::new(&search_targets)?;
+        let url_maker = TargetUrlMaker::new(&base_url, &search_targets)?;
         let i = Inner {
             base_url,
             templates,

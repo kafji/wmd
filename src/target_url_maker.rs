@@ -17,21 +17,24 @@ struct Inner {
 }
 
 impl TargetUrlMaker {
-    pub fn new(targets: &[SearchTarget]) -> Result<Self, Error> {
+    pub fn new(base_url: &Url, targets: &[SearchTarget]) -> Result<Self, Error> {
         ensure!(!targets.is_empty());
         let default = {
-            let first = (&targets[0].url_template).clone();
-            let g: Box<dyn Fn(&str) -> String + Send + Sync> =
-                Box::new(move |kw| first.replace("{keywords}", kw));
-            g
+            let base_url = base_url.to_owned();
+            let f: Box<dyn Fn(&str) -> String + Send + Sync> = Box::new(move |kw| {
+                let mut url = base_url.clone();
+                url.set_query(Some(&format!("q={}", kw)));
+                url.to_string()
+            });
+            f
         };
         let registry = targets
             .iter()
             .cloned()
             .map(|t| {
-                let g: Box<dyn Fn(&str) -> String + Send + Sync> =
+                let f: Box<dyn Fn(&str) -> String + Send + Sync> =
                     Box::new(move |kw| t.url_template.replace("{keywords}", kw));
-                (t.prefix, g)
+                (t.prefix, f)
             })
             .collect::<HashMap<_, _>>();
         let s = Self {
@@ -65,7 +68,8 @@ mod tests {
             prefix: String::from("ex"),
             url_template: String::from("http://example.com?q={keywords}"),
         }];
-        let maker = TargetUrlMaker::new(&targets).unwrap();
+        let maker =
+            TargetUrlMaker::new(&Url::parse("http://localhost").unwrap(), &targets).unwrap();
 
         let url = maker.make_url(&parse_search_query("ex hello")).unwrap();
 
@@ -86,7 +90,8 @@ mod tests {
                 url_template: String::from("https://hoogle.haskell.org/?hoogle={keywords}"),
             },
         ];
-        let maker = TargetUrlMaker::new(&targets).unwrap();
+        let maker =
+            TargetUrlMaker::new(&Url::parse("http://localhost").unwrap(), &targets).unwrap();
 
         let url = maker
             .make_url(&parse_search_query("hg +mtl reader"))
@@ -96,5 +101,20 @@ mod tests {
             url.to_string(),
             "https://hoogle.haskell.org/?hoogle=%2Bmtl%20reader"
         );
+    }
+
+    #[test]
+    fn test_with_missing_prefix() {
+        let targets = vec![SearchTarget {
+            name: String::from("Example"),
+            prefix: String::from("ex"),
+            url_template: String::from("http://example.com?q={keywords}"),
+        }];
+        let maker =
+            TargetUrlMaker::new(&Url::parse("http://localhost").unwrap(), &targets).unwrap();
+
+        let url = maker.make_url(&parse_search_query("hello")).unwrap();
+
+        assert_eq!(url.to_string(), "http://localhost/?q=hello");
     }
 }
