@@ -116,6 +116,6 @@ mod tests {
 
         let url = maker.make_url(&parse_search_query("hello")).unwrap();
 
-        assert_eq!(url.to_string(), "http://localhost/?q=hello");
+        assert_eq!(url.to_string(), "http://localhost/?q=ex%20hello");
     }
 }

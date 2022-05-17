@@ -93,7 +93,7 @@ async fn test_do_search_with_missing_prefix() {
     assert_eq!(response.status(), StatusCode::TEMPORARY_REDIRECT);
     assert_eq!(
         response.headers().get("location").unwrap(),
-        "http://127.0.0.1:3000/?q=tokio"
+        "http://127.0.0.1:3000/?q=rs%20tokio"
     );
 }
 
