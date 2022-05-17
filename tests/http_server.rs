@@ -1,4 +1,5 @@
 use http::StatusCode;
+use reqwest::redirect::Policy;
 use std::time::Duration;
 use tokio::{sync::oneshot, task};
 
@@ -23,7 +24,13 @@ macro_rules! request_once {
     ($path:expr) => {{
         launch_server!(ready_rx);
         let port = ready_rx.await.unwrap();
-        let response = reqwest::get(format!("http://127.0.0.1:{}{}", port, $path))
+        let client = reqwest::Client::builder()
+            .redirect(Policy::none())
+            .build()
+            .expect("failed to create HTTP client");
+        let response = client
+            .get(format!("http://127.0.0.1:{}{}", port, $path))
+            .send()
             .await
             .unwrap();
         response
@@ -57,6 +64,17 @@ async fn test_get_index() {
     assert_string_response!(response, StatusCode::OK, mime::TEXT_HTML_UTF_8, |body| {
         insta::assert_display_snapshot!(body);
     });
+}
+
+#[tokio::test]
+async fn test_get_search() {
+    let response = request_once!("/search?q=drx%20tokio");
+
+    assert_eq!(response.status(), StatusCode::TEMPORARY_REDIRECT);
+    assert_eq!(
+        response.headers().get("location").unwrap(),
+        "https://docs.rs/tokio"
+    );
 }
 
 #[tokio::test]
