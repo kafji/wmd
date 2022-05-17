@@ -1,5 +1,5 @@
 # used to generate open search description
-base_url = "http://127.0.0.1:8000/"
+base_url = "http://127.0.0.1:3000/"
 
 [[targets]]
 prefix = "rs"
@@ -9,5 +9,5 @@ url_template = "https://doc.rust-lang.org/std/index.html?search={keywords}"
 [[targets]]
 prefix = "drx"
 name = "Docs.rs (direct)"
-# `keywords` will be replaced by the actual keywords
+# `{keywords}` will be replaced by the actual keywords
 url_template = "https://docs.rs/{keywords}"

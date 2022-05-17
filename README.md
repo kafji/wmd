@@ -1,3 +1,3 @@
 # Wmd
 
-> Web commands.
+Web search proxy.

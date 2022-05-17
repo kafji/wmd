@@ -1,1 +1,1 @@
-# wmd-hs
+Experimental Wmd implementation in Haskell.

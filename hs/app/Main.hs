@@ -1,6 +1,6 @@
 module Main where
 
-import Lib (app)
+import Wmd.App
 
 main :: IO ()
-main = app
+main = run

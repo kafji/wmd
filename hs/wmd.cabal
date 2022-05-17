@@ -5,18 +5,16 @@ cabal-version: 1.12
 -- see: https://github.com/sol/hpack
 
 name:           wmd
-version:        0.1.0.0
+version:        0.0.0.0
+description:    Please see the README on GitHub at <https://github.com/kafji/wmd#readme>
 homepage:       https://github.com/kafji/wmd#readme
 bug-reports:    https://github.com/kafji/wmd/issues
 author:         Kafji
 maintainer:     k@kafji.net
 copyright:      2022 Kafji
-license:        MIT
-license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
     README.md
-    ChangeLog.md
 
 source-repository head
   type: git
@@ -24,64 +22,129 @@ source-repository head
 
 library
   exposed-modules:
-      Config
-      Http.Handlers
-      Http.Server
-      Lib
+      Wmd.App
+      Wmd.Config
+      Wmd.HTML
+      Wmd.HTTPServer
+      Wmd.PercentEncoding
+      Wmd.SearchQuery
+      Wmd.TargetURLFactory
+      Wmd.Types
   other-modules:
       Paths_wmd
   hs-source-dirs:
       src
+  default-extensions:
+      BangPatterns
+      BlockArguments
+      DeriveAnyClass
+      DeriveGeneric
+      FlexibleContexts
+      LambdaCase
+      ImportQualifiedPost
+      NoStarIsType
+      OverloadedStrings
+      QuasiQuotes
+      ScopedTypeVariables
+      TemplateHaskell
+      TypeApplications
   build-depends:
       base >=4.7 && <5
     , blaze-html
-    , bytestring
     , containers
     , htoml-megaparsec
+    , htoml-parse
+    , lens
+    , megaparsec
+    , mtl
     , scotty
+    , tagsoup
     , text
     , unordered-containers
-    , wai
-    , warp
+    , vector
+    , wai-extra
   default-language: Haskell2010
 
 executable wmd-hs-exe
   main-is: Main.hs
   hs-source-dirs:
       app
+  default-extensions:
+      BangPatterns
+      BlockArguments
+      DeriveAnyClass
+      DeriveGeneric
+      FlexibleContexts
+      LambdaCase
+      ImportQualifiedPost
+      NoStarIsType
+      OverloadedStrings
+      QuasiQuotes
+      ScopedTypeVariables
+      TemplateHaskell
+      TypeApplications
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
     , blaze-html
-    , bytestring
     , containers
     , htoml-megaparsec
+    , htoml-parse
+    , lens
+    , megaparsec
+    , mtl
     , scotty
+    , tagsoup
     , text
     , unordered-containers
-    , wai
-    , warp
+    , vector
+    , wai-extra
     , wmd
   default-language: Haskell2010
 
 test-suite wmd-test
   type: exitcode-stdio-1.0
-  main-is: Spec.hs
+  main-is: Test.hs
   other-modules:
+      Test.Wmd.ConfigTest
+      Test.Wmd.PercentEncoding
+      Test.Wmd.SearchQuery
       Paths_wmd
   hs-source-dirs:
       test
+  default-extensions:
+      BangPatterns
+      BlockArguments
+      DeriveAnyClass
+      DeriveGeneric
+      FlexibleContexts
+      LambdaCase
+      ImportQualifiedPost
+      NoStarIsType
+      OverloadedStrings
+      QuasiQuotes
+      ScopedTypeVariables
+      TemplateHaskell
+      TypeApplications
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
     , blaze-html
-    , bytestring
     , containers
     , htoml-megaparsec
+    , htoml-parse
+    , lens
+    , megaparsec
+    , mtl
     , scotty
+    , tagsoup
+    , tasty
+    , tasty-hedgehog
+    , tasty-hunit
+    , tasty-quickcheck
     , text
     , unordered-containers
-    , wai
-    , warp
+    , vector
+    , wai-extra
     , wmd
   default-language: Haskell2010

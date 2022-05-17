@@ -1,0 +1,8 @@
+---
+source: tests/http_server.rs
+assertion_line: 89
+expression: body
+---
+User-agent: *
+Disallow: /
+
