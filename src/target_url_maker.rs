@@ -20,10 +20,11 @@ impl TargetUrlMaker {
     pub fn new(base_url: &Url, targets: &[SearchTarget]) -> Result<Self, Error> {
         ensure!(!targets.is_empty());
         let default = {
+            let first_pf = targets.first().unwrap().prefix.clone();
             let base_url = base_url.to_owned();
             let f: Box<dyn Fn(&str) -> String + Send + Sync> = Box::new(move |kw| {
                 let mut url = base_url.clone();
-                url.set_query(Some(&format!("q={}", kw)));
+                url.set_query(Some(&format!("q={} {}", first_pf, kw)));
                 url.to_string()
             });
             f
