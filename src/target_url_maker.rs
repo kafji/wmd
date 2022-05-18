@@ -1,4 +1,4 @@
-use crate::{app::SearchTarget, search_query::SearchQuery};
+use crate::{app::SearchTarget, percent_encoding::encode, search_query::SearchQuery};
 use anyhow::{ensure, Error};
 use std::{collections::HashMap, sync::Arc};
 use url::Url;
@@ -50,9 +50,9 @@ impl TargetUrlMaker {
             .prefix
             .and_then(|prefix| {
                 let reg = &self.inner.registry;
-                reg.get(prefix).map(|f| f(query.keywords.as_str()))
+                reg.get(prefix).map(|f| f(encode(query.keywords).as_str()))
             })
-            .unwrap_or_else(|| (self.inner.default)(query.keywords.as_str()));
+            .unwrap_or_else(|| (self.inner.default)(encode(&query.to_string()).as_str()));
         Url::parse(&url).map_err(Error::new)
     }
 }
@@ -114,8 +114,8 @@ mod tests {
         let maker =
             TargetUrlMaker::new(&Url::parse("http://localhost").unwrap(), &targets).unwrap();
 
-        let url = maker.make_url(&parse_search_query("hello")).unwrap();
+        let url = maker.make_url(&parse_search_query("hello world")).unwrap();
 
-        assert_eq!(url.to_string(), "http://localhost/?q=ex%20hello");
+        assert_eq!(url.to_string(), "http://localhost/?q=ex%20hello%20world");
     }
 }

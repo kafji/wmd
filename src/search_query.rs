@@ -1,8 +1,18 @@
-use crate::percent_encoding::{encode, PercentEncoded};
+use std::fmt;
 
 pub struct SearchQuery<'a> {
     pub prefix: Option<&'a str>,
-    pub keywords: PercentEncoded<'a>,
+    pub keywords: &'a str,
+}
+
+impl fmt::Display for SearchQuery<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        if let Some(x) = self.prefix {
+            write!(f, "{} ", x)?;
+        }
+        write!(f, "{}", &self.keywords)?;
+        Ok(())
+    }
 }
 
 pub fn parse_search_query(s: &str) -> SearchQuery {
@@ -18,7 +28,6 @@ pub fn parse_search_query(s: &str) -> SearchQuery {
             (None, kw)
         }
     };
-    let keywords = encode(keywords);
     SearchQuery { prefix, keywords }
 }
 
@@ -30,13 +39,13 @@ mod tests {
     fn test_trivial() {
         let query = parse_search_query("rs result");
         assert_eq!(query.prefix, Some("rs"));
-        assert_eq!(query.keywords, encode("result"));
+        assert_eq!(query.keywords, "result");
     }
 
     #[test]
     fn test_missing_prefix() {
         let query = parse_search_query("result");
         assert_eq!(query.prefix, None);
-        assert_eq!(query.keywords, encode("result"));
+        assert_eq!(query.keywords, "result");
     }
 }
