@@ -1,5 +1,5 @@
 use crate::{app::SearchTarget, percent_encoding::encode, search_query::SearchQuery};
-use anyhow::{ensure, Error};
+use anyhow::{anyhow, ensure, Error};
 use std::{collections::HashMap, sync::Arc};
 use url::Url;
 
@@ -53,7 +53,7 @@ impl TargetUrlMaker {
                 reg.get(prefix).map(|f| f(encode(query.keywords).as_str()))
             })
             .unwrap_or_else(|| (self.inner.default)(encode(&query.to_string()).as_str()));
-        Url::parse(&url).map_err(Error::new)
+        Url::parse(&url).map_err(|x| anyhow!(x))
     }
 }
 
