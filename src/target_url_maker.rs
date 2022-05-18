@@ -47,12 +47,13 @@ impl TargetUrlMaker {
     /// Makes URL for the given search query.
     pub fn make_url(&self, query: &SearchQuery) -> Result<Url, Error> {
         let url = query
-            .prefix
+            .prefix()
             .and_then(|prefix| {
                 let reg = &self.inner.registry;
-                reg.get(prefix).map(|f| f(encode(query.keywords).as_str()))
+                reg.get(prefix)
+                    .map(|f| f(encode(query.keywords()).as_str()))
             })
-            .unwrap_or_else(|| (self.inner.default)(encode(&query.to_string()).as_str()));
+            .unwrap_or_else(|| (self.inner.default)(encode(query.into_str()).as_str()));
         Url::parse(&url).map_err(|x| anyhow!(x))
     }
 }
@@ -60,7 +61,6 @@ impl TargetUrlMaker {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::search_query::parse_search_query;
 
     #[test]
     fn test_trivial() {
@@ -72,7 +72,7 @@ mod tests {
         let maker =
             TargetUrlMaker::new(&Url::parse("http://localhost").unwrap(), &targets).unwrap();
 
-        let url = maker.make_url(&parse_search_query("ex hello")).unwrap();
+        let url = maker.make_url(&SearchQuery::new("ex hello")).unwrap();
 
         assert_eq!(url.to_string(), "http://example.com/?q=hello");
     }
@@ -94,9 +94,7 @@ mod tests {
         let maker =
             TargetUrlMaker::new(&Url::parse("http://localhost").unwrap(), &targets).unwrap();
 
-        let url = maker
-            .make_url(&parse_search_query("hg +mtl reader"))
-            .unwrap();
+        let url = maker.make_url(&SearchQuery::new("hg +mtl reader")).unwrap();
 
         assert_eq!(
             url.to_string(),
@@ -114,7 +112,7 @@ mod tests {
         let maker =
             TargetUrlMaker::new(&Url::parse("http://localhost").unwrap(), &targets).unwrap();
 
-        let url = maker.make_url(&parse_search_query("hello world")).unwrap();
+        let url = maker.make_url(&SearchQuery::new("hello world")).unwrap();
 
         assert_eq!(url.to_string(), "http://localhost/?q=ex%20hello%20world");
     }

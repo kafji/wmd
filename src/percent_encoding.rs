@@ -31,7 +31,6 @@ fn special_chars_positions(s: &str) -> Vec<usize> {
 pub struct PercentEncoded<'a>(Cow<'a, str>);
 
 impl PercentEncoded<'_> {
-    #[inline]
     pub fn as_str(&self) -> &str {
         self.0.as_ref()
     }

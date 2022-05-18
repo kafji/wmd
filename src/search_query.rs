@@ -1,34 +1,51 @@
-use std::fmt;
-
 pub struct SearchQuery<'a> {
-    pub prefix: Option<&'a str>,
-    pub keywords: &'a str,
+    original: &'a str,
+    prefix: Option<&'a str>,
+    keywords: &'a str,
 }
 
-impl fmt::Display for SearchQuery<'_> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        if let Some(x) = self.prefix {
-            write!(f, "{} ", x)?;
-        }
-        write!(f, "{}", &self.keywords)?;
-        Ok(())
+impl<'a> SearchQuery<'a> {
+    pub fn new<'s>(query: &'s str) -> Self
+    where
+        's: 'a,
+    {
+        parse_search_query(query)
+    }
+
+    pub fn prefix(&self) -> Option<&str> {
+        self.prefix
+    }
+
+    pub fn keywords(&self) -> &str {
+        self.keywords
+    }
+
+    pub fn into_str(&self) -> &'a str {
+        self.original
     }
 }
 
-pub fn parse_search_query(s: &str) -> SearchQuery {
-    let sep_idx = s.char_indices().find(|(_, c)| *c == ' ').map(|(i, _)| i);
+fn parse_search_query(query: &str) -> SearchQuery {
+    let sep_idx = query
+        .char_indices()
+        .find(|(_, c)| *c == ' ')
+        .map(|(i, _)| i);
     let (prefix, keywords) = match sep_idx {
         Some(sep_idx) => {
-            let pf = &s[..sep_idx];
-            let kw = &s[sep_idx + 1..];
+            let pf = &query[..sep_idx];
+            let kw = &query[sep_idx + 1..];
             (Some(pf), kw)
         }
         None => {
-            let kw = &s[..];
+            let kw = &query[..];
             (None, kw)
         }
     };
-    SearchQuery { prefix, keywords }
+    SearchQuery {
+        original: query,
+        prefix,
+        keywords,
+    }
 }
 
 #[cfg(test)]

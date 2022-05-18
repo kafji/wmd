@@ -3,7 +3,7 @@ HTTP requests handlers.
 */
 
 use super::env::Env;
-use crate::{search_query::parse_search_query, templating::Template::*};
+use crate::{search_query::SearchQuery, templating::Template::*};
 use axum::{
     body::Full,
     extract::Query,
@@ -112,7 +112,7 @@ pub async fn get_search(
     Query(params): Query<SearchParams>,
     Extension(env): Extension<Env>,
 ) -> Reply {
-    let query = parse_search_query(&params.q);
+    let query = SearchQuery::new(&params.q);
     let url = env
         .target_url_maker()
         .make_url(&query)
