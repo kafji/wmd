@@ -31,14 +31,14 @@ import Web.Scotty.Trans (
  )
 import Wmd.HTML (homePage, searchPage)
 import Wmd.SearchQuery (parseSearchQuery)
-import Wmd.TargetURLFactory (TargetURLFactory, createTargetURL)
+import Wmd.TargetURLMaker (TargetURLMaker, createTargetURL)
 
 type Server m = ScottyT LazyText.Text m ()
 
 type Handler e m = ActionT e m ()
 
 data ServerEnv = ServerEnv
-  { targetUrlGenerator :: TargetURLFactory
+  { targetUrlGenerator :: TargetURLMaker
   }
 
 server :: (MonadIO m, MonadReader ServerEnv m) => Server m

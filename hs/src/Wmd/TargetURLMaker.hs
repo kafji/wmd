@@ -2,8 +2,8 @@
 {-# LANGUAGE ImportQualifiedPost #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Wmd.TargetURLFactory (
-  TargetURLFactory (TargetURLFactory),
+module Wmd.TargetURLMaker (
+  TargetURLMaker (TargetURLMaker),
   createTargetURL,
 ) where
 
@@ -15,12 +15,12 @@ import Wmd.Types
 
 type TargetURLProducer = QueryKeywords -> URL
 
-data TargetURLFactory = TargetURLFactory
+data TargetURLMaker = TargetURLMaker
   { default' :: TargetURLProducer
   , registry :: M.HashMap QueryPrefix TargetURLProducer
   }
 
-createTargetURL :: (MonadReader TargetURLFactory m, MonadFail m) => SearchQuery -> m URL
+createTargetURL :: (MonadReader TargetURLMaker m, MonadFail m) => SearchQuery -> m URL
 createTargetURL query = do
   let Query pf kw = query
   gen <- case pf of

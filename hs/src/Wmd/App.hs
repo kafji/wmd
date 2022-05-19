@@ -2,14 +2,14 @@ module Wmd.App where
 
 import Data.Text (Text)
 import Wmd.Config (Config, config)
-import Wmd.TargetURLFactory (TargetURLFactory)
+import Wmd.TargetURLMaker (TargetURLMaker)
 
 type Prefix = Text
 
 type Keywords = Text
 
 data App = App
-  { urlGenerators :: TargetURLFactory
+  { urlGenerators :: TargetURLMaker
   }
 
 app :: MonadFail m => Config -> m App

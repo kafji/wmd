@@ -28,7 +28,7 @@ library
       Wmd.HTTPServer
       Wmd.PercentEncoding
       Wmd.SearchQuery
-      Wmd.TargetURLFactory
+      Wmd.TargetURLMaker
       Wmd.Types
   other-modules:
       Paths_wmd
