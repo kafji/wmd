@@ -1,5 +1,6 @@
 use crate::{
     app::SearchTarget,
+    search_targets::SearchTargets,
     target_url_maker::TargetUrlMaker,
     templating::{create_templates, Templates},
 };
@@ -16,17 +17,20 @@ struct Inner {
     templates: Templates,
     url_maker: TargetUrlMaker,
     search_targets: Vec<SearchTarget>,
+    search_targets2: SearchTargets,
 }
 
 impl Env {
     pub fn new(base_url: Url, search_targets: Vec<SearchTarget>) -> Result<Self, Error> {
         let templates = create_templates()?;
-        let url_maker = TargetUrlMaker::new(&base_url, &search_targets)?;
+        let url_maker = TargetUrlMaker::new(&search_targets)?;
+        let search_targets2 = SearchTargets::new(search_targets.clone())?;
         let i = Inner {
             base_url,
             templates,
             url_maker,
-            search_targets: search_targets.to_vec(),
+            search_targets,
+            search_targets2,
         };
         let s = Self(Arc::new(i));
         Ok(s)
@@ -46,5 +50,9 @@ impl Env {
 
     pub fn search_targets(&self) -> &[SearchTarget] {
         &self.0.search_targets
+    }
+
+    pub fn search_targets2(&self) -> &SearchTargets {
+        &self.0.search_targets2
     }
 }

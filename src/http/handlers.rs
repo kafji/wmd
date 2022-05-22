@@ -89,16 +89,24 @@ impl IntoResponse for Error {
 
 #[derive(Debug, Deserialize)]
 pub struct IndexParams {
-    q: Option<String>,
+    k: Option<String>,
 }
 
 #[cfg_attr(debug_assertions, axum_macros::debug_handler)]
-pub async fn get_index(Query(params): Query<IndexParams>, Extension(env): Extension<Env>) -> Reply {
+pub async fn get_index(Extension(env): Extension<Env>, Query(params): Query<IndexParams>) -> Reply {
+    let query: Option<String> = params.k.map(|keywords| {
+        let prefix = &env.search_targets2().default().prefix;
+        let mut query = String::with_capacity(prefix.len() + 1 + keywords.len());
+        query.push_str(prefix);
+        query.push(' ');
+        query.push_str(&keywords);
+        query
+    });
     reply_with_html!(
         env.templates(),
         HomePageHtml,
         &json!({
-            "query": params.q,
+            "query": query,
         })
     )
 }
@@ -113,14 +121,22 @@ pub async fn get_search(
     Extension(env): Extension<Env>,
 ) -> Reply {
     let query = SearchQuery::new(&params.q);
-    let url = env
-        .target_url_maker()
-        .make_url(&query)
-        .map_err(|x| Error::InvalidTargetUrl {
-            desc: x.to_string(),
-        })?;
-    let resp = Redirect::temporary(url.as_str());
-    Ok(resp.into_response())
+    let url = env.target_url_maker().make_url(&query);
+    Ok(match url {
+        Some(url) => Redirect::temporary(
+            url.map_err(|x| Error::InvalidTargetUrl {
+                desc: x.to_string(),
+            })?
+            .as_str(),
+        )
+        .into_response(),
+        None => {
+            let mut url = env.base_url().clone();
+            let params = Some(format!("k={}", query.into_str()));
+            url.set_query(params.as_deref());
+            Redirect::temporary(url.as_str()).into_response()
+        }
+    })
 }
 
 #[cfg_attr(debug_assertions, debug_handler)]

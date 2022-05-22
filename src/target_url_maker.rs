@@ -9,7 +9,6 @@ pub struct TargetUrlMaker {
 }
 
 struct Inner {
-    default: Box<dyn (Fn(&str) -> String) + Send + Sync>,
     registry: HashMap<
         String,                                      /* prefix */
         Box<dyn (Fn(&str) -> String) + Send + Sync>, /* factory */
@@ -17,18 +16,8 @@ struct Inner {
 }
 
 impl TargetUrlMaker {
-    pub fn new(base_url: &Url, targets: &[SearchTarget]) -> Result<Self, Error> {
+    pub fn new(targets: &[SearchTarget]) -> Result<Self, Error> {
         ensure!(!targets.is_empty());
-        let default = {
-            let first_pf = targets.first().unwrap().prefix.clone();
-            let base_url = base_url.to_owned();
-            let f: Box<dyn Fn(&str) -> String + Send + Sync> = Box::new(move |kw| {
-                let mut url = base_url.clone();
-                url.set_query(Some(&format!("q={} {}", first_pf, kw)));
-                url.to_string()
-            });
-            f
-        };
         let registry = targets
             .iter()
             .cloned()
@@ -39,22 +28,23 @@ impl TargetUrlMaker {
             })
             .collect::<HashMap<_, _>>();
         let s = Self {
-            inner: Arc::new(Inner { default, registry }),
+            inner: Arc::new(Inner { registry }),
         };
         Ok(s)
     }
 
     /// Makes URL for the given search query.
-    pub fn make_url(&self, query: &SearchQuery) -> Result<Url, Error> {
-        let url = query
-            .prefix()
-            .and_then(|prefix| {
-                let reg = &self.inner.registry;
-                reg.get(prefix)
-                    .map(|f| f(encode(query.keywords()).as_str()))
-            })
-            .unwrap_or_else(|| (self.inner.default)(encode(query.into_str()).as_str()));
-        Url::parse(&url).map_err(|x| anyhow!(x))
+    pub fn make_url(&self, query: &SearchQuery) -> Option<Result<Url, Error>> {
+        let prefix = match query.prefix() {
+            Some(x) => x,
+            None => return None,
+        };
+        let maker = match self.inner.registry.get(prefix) {
+            Some(x) => x,
+            None => return None,
+        };
+        let url = maker(encode(query.keywords()).as_str());
+        Some(Url::parse(&url).map_err(|err| anyhow!(err)))
     }
 }
 
@@ -69,10 +59,12 @@ mod tests {
             prefix: String::from("ex"),
             url_template: String::from("http://example.com?q={keywords}"),
         }];
-        let maker =
-            TargetUrlMaker::new(&Url::parse("http://localhost").unwrap(), &targets).unwrap();
+        let maker = TargetUrlMaker::new(&targets).unwrap();
 
-        let url = maker.make_url(&SearchQuery::new("ex hello")).unwrap();
+        let url = maker
+            .make_url(&SearchQuery::new("ex hello"))
+            .unwrap()
+            .unwrap();
 
         assert_eq!(url.to_string(), "http://example.com/?q=hello");
     }
@@ -91,10 +83,12 @@ mod tests {
                 url_template: String::from("https://hoogle.haskell.org/?hoogle={keywords}"),
             },
         ];
-        let maker =
-            TargetUrlMaker::new(&Url::parse("http://localhost").unwrap(), &targets).unwrap();
+        let maker = TargetUrlMaker::new(&targets).unwrap();
 
-        let url = maker.make_url(&SearchQuery::new("hg +mtl reader")).unwrap();
+        let url = maker
+            .make_url(&SearchQuery::new("hg +mtl reader"))
+            .unwrap()
+            .unwrap();
 
         assert_eq!(
             url.to_string(),
@@ -109,11 +103,9 @@ mod tests {
             prefix: String::from("ex"),
             url_template: String::from("http://example.com?q={keywords}"),
         }];
-        let maker =
-            TargetUrlMaker::new(&Url::parse("http://localhost").unwrap(), &targets).unwrap();
+        let maker = TargetUrlMaker::new(&targets).unwrap();
 
-        let url = maker.make_url(&SearchQuery::new("hello world")).unwrap();
-
-        assert_eq!(url.to_string(), "http://localhost/?q=ex%20hello%20world");
+        let url = maker.make_url(&SearchQuery::new("hello world"));
+        assert!(url.is_none())
     }
 }

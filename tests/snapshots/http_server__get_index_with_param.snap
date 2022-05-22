@@ -15,7 +15,7 @@ expression: body
 <body>
   <p>
   <form method="GET" action="/search">
-    <input type="text" name="q" value="hello">
+    <input type="text" name="q" value="rs hello">
     <button>Go</button>
   </form>
   </p>

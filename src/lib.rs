@@ -3,6 +3,7 @@ mod config;
 mod http;
 mod percent_encoding;
 mod search_query;
+mod search_targets;
 mod target_url_maker;
 mod templating;
 

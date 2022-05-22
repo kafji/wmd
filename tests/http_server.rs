@@ -68,7 +68,7 @@ async fn test_get_index() {
 
 #[tokio::test]
 async fn test_get_index_with_param() {
-    let response = request_once!("/?q=hello");
+    let response = request_once!("/?k=hello");
 
     assert_string_response!(response, StatusCode::OK, mime::TEXT_HTML_UTF_8, |body| {
         insta::assert_display_snapshot!(body);
@@ -93,7 +93,7 @@ async fn test_do_search_with_missing_prefix() {
     assert_eq!(response.status(), StatusCode::TEMPORARY_REDIRECT);
     assert_eq!(
         response.headers().get("location").unwrap(),
-        "http://127.0.0.1:3000/?q=rs%20tokio"
+        "http://127.0.0.1:3000/?k=tokio"
     );
 }
 
