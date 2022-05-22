@@ -43,7 +43,7 @@ tomlParser :: (Monad m, TomlParse m) => L Table -> m Config
 tomlParser doc = Config <$> baseURL <*> targets
   where
     baseURL = pKey "base_url" doc >>= pStr
-    targets = pKey "targets" doc >>= pTArray >>= _
+    targets = pKey "targets" doc >>= pTArray >>= undefined
 
 config :: FilePath -> IO Config
 config path = fromFile path
