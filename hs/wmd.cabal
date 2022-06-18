@@ -75,7 +75,9 @@ library
     , transformers
     , unordered-containers
     , vector
+    , wai
     , wai-extra
+    , warp
   default-language: GHC2021
 
 executable wmd-app
@@ -118,7 +120,9 @@ executable wmd-app
     , transformers
     , unordered-containers
     , vector
+    , wai
     , wai-extra
+    , warp
     , wmd
   default-language: GHC2021
 
@@ -172,6 +176,8 @@ test-suite wmd-test
     , transformers
     , unordered-containers
     , vector
+    , wai
     , wai-extra
+    , warp
     , wmd
   default-language: GHC2021

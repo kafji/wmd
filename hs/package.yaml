@@ -27,7 +27,9 @@ dependencies:
   - transformers
   - unordered-containers
   - vector
+  - wai
   - wai-extra
+  - warp
 
 default-extensions:
   - BangPatterns

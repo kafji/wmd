@@ -4,13 +4,16 @@ module Wmd.App (
 
 import Control.Monad.Reader (MonadTrans (lift), ReaderT (runReaderT), asks)
 import Data.Either.Combinators (fromRight)
+import Data.Text.IO qualified as TextIO
 import Data.Vector (Vector)
 import Data.Vector qualified as Vector
 import Data.Word (Word16)
+import Network.Wai.Handler.Warp qualified as Warp
+import TextShow (TextShow (showt))
 import Wmd.Cli (Flags (..), getFlags)
 import Wmd.Config (getConfig)
 import Wmd.Config.Type (Config (..))
-import Wmd.HttpServer (ServerEnv (ServerEnv), runServer)
+import Wmd.HttpServer (ServerEnv (ServerEnv), getServer)
 import Wmd.TargetUrl (urlFactory)
 import Wmd.Type.SearchTarget (SearchTarget, fromConfig)
 
@@ -29,7 +32,9 @@ app :: AppM ()
 app = do
   port <- asks serverPort
   targets <- asks urlTargets
-  lift $ runServer (ServerEnv port (urlFactory targets) (targets))
+  server <- lift $ getServer (ServerEnv (urlFactory targets) (targets))
+  lift $ TextIO.putStrLn $ "starting server at port: " <> showt port
+  lift $ Warp.run (fromIntegral port) server
 
 runApp :: IO ()
 runApp = do

@@ -3,7 +3,7 @@ Defines HTTP server and its request handlers.
 -}
 module Wmd.HttpServer (
   ServerEnv (ServerEnv),
-  runServer,
+  getServer,
 ) where
 
 import Control.Applicative (Alternative ((<|>)))
@@ -15,7 +15,7 @@ import Data.Text (Text)
 import Data.Text qualified as Text
 import Data.Text.Lazy qualified as TextL
 import Data.Vector (Vector)
-import Data.Word (Word16)
+import Network.Wai (Application)
 import Network.Wai.Middleware.RequestLogger (logStdout)
 import Web.Scotty.Trans
 import Wmd.Html (homePage, prefixesPage, searchPage)
@@ -24,8 +24,7 @@ import Wmd.Type.SearchQuery (SearchQuery)
 import Wmd.Type.SearchTarget (SearchTarget)
 
 data ServerEnv = ServerEnv
-  { serverPort :: Word16
-  , createUrl :: SearchQuery -> Maybe Text
+  { createUrl :: SearchQuery -> Maybe Text
   , targets :: Vector SearchTarget
   }
 
@@ -42,8 +41,10 @@ server = do
     , get "/prefixes" getPrefixes
     ]
 
-runServer :: ServerEnv -> IO ()
-runServer env = scottyT (fromIntegral env.serverPort) (flip runReaderT env) server
+getServer :: ServerEnv -> IO Application
+getServer env = scottyAppT run server
+  where
+    run = flip runReaderT env
 
 -- | Handles `GET /`.
 getIndex :: Handler e
