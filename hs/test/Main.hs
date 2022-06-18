@@ -1,15 +1,19 @@
-module Main where
+module Main (
+  main,
+) where
 
-import Test.Tasty
-import Wmd.Test.PercentEncodingTest
-import Wmd.Test.SearchQueryTest
+import Test.Tasty (defaultMain, testGroup)
+import Wmd.Test.HttpServerTest (httpServerTests)
+import Wmd.Test.PercentEncodingTest (percentEncodingTests)
+import Wmd.Test.SearchQueryTest (searchQueryTests)
 
 main :: IO ()
 main = defaultMain tests
 
 tests =
   testGroup
-    "Tests"
-    [ searchQueryTests
+    "tests"
+    [ httpServerTests
+    , searchQueryTests
     , percentEncodingTests
     ]

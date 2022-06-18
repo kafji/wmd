@@ -1,15 +1,18 @@
-module Wmd.Test.PercentEncodingTest where
+module Wmd.Test.PercentEncodingTest (
+  percentEncodingTests,
+) where
 
 import Test.Tasty
 import Test.Tasty.HUnit
 import Wmd.PercentEncoding
 
+percentEncodingTests :: TestTree
 percentEncodingTests =
   testGroup
-    "Percent encoding"
+    "percent encoding"
     [ testGroup
-        "Encode text"
-        [ testCase "Encode plus and space" $ "%2Bmtl%20reader" @=? (toText $ encodeText "+mtl reader")
-        , testCase "Empty string" $ "" @=? (toText $ encodeText "")
+        "encode text"
+        [ testCase "encode plus and space" $ "%2Bmtl%20reader" @=? (toText $ encodeText "+mtl reader")
+        , testCase "empty string" $ "" @=? (toText $ encodeText "")
         ]
     ]
