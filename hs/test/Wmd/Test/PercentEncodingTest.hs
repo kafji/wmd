@@ -1,6 +1,4 @@
-{-# LANGUAGE OverloadedStrings #-}
-
-module Test.Wmd.PercentEncoding where
+module Wmd.Test.PercentEncodingTest where
 
 import Test.Tasty
 import Test.Tasty.HUnit

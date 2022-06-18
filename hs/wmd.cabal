@@ -1,12 +1,11 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.34.4.
+-- This file has been generated from package.yaml by hpack version 0.35.0.
 --
 -- see: https://github.com/sol/hpack
 
 name:           wmd
 version:        0.0.0.0
-description:    Please see the README on GitHub at <https://github.com/kafji/wmd#readme>
 homepage:       https://github.com/kafji/wmd#readme
 bug-reports:    https://github.com/kafji/wmd/issues
 author:         Kafji
@@ -22,14 +21,21 @@ source-repository head
 
 library
   exposed-modules:
+      Wmd
       Wmd.App
+      Wmd.Cli
       Wmd.Config
-      Wmd.HTML
-      Wmd.HTTPServer
+      Wmd.Config.Parser
+      Wmd.Config.Type
+      Wmd.Html
+      Wmd.HttpServer
       Wmd.PercentEncoding
       Wmd.SearchQuery
-      Wmd.TargetURLMaker
-      Wmd.Types
+      Wmd.TargetUrl
+      Wmd.Type.Result
+      Wmd.Type.SearchQuery
+      Wmd.Type.SearchTarget
+      Wmd.Type.Url
   other-modules:
       Paths_wmd
   hs-source-dirs:
@@ -43,29 +49,36 @@ library
       LambdaCase
       ImportQualifiedPost
       NoStarIsType
+      OverloadedRecordDot
       OverloadedStrings
       QuasiQuotes
+      RecordWildCards
       ScopedTypeVariables
       TemplateHaskell
       TypeApplications
   build-depends:
-      base >=4.7 && <5
+      base
     , blaze-html
+    , bytestring
     , containers
+    , either
+    , fmt
     , htoml-megaparsec
-    , htoml-parse
     , lens
     , megaparsec
     , mtl
+    , optparse-applicative
     , scotty
     , tagsoup
     , text
+    , text-show
+    , transformers
     , unordered-containers
     , vector
     , wai-extra
-  default-language: Haskell2010
+  default-language: GHC2021
 
-executable wmd-hs-exe
+executable wmd-app
   main-is: Main.hs
   hs-source-dirs:
       app
@@ -78,37 +91,43 @@ executable wmd-hs-exe
       LambdaCase
       ImportQualifiedPost
       NoStarIsType
+      OverloadedRecordDot
       OverloadedStrings
       QuasiQuotes
+      RecordWildCards
       ScopedTypeVariables
       TemplateHaskell
       TypeApplications
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      base
     , blaze-html
+    , bytestring
     , containers
+    , either
+    , fmt
     , htoml-megaparsec
-    , htoml-parse
     , lens
     , megaparsec
     , mtl
+    , optparse-applicative
     , scotty
     , tagsoup
     , text
+    , text-show
+    , transformers
     , unordered-containers
     , vector
     , wai-extra
     , wmd
-  default-language: Haskell2010
+  default-language: GHC2021
 
 test-suite wmd-test
   type: exitcode-stdio-1.0
-  main-is: Test.hs
+  main-is: Main.hs
   other-modules:
-      Test.Wmd.ConfigTest
-      Test.Wmd.PercentEncoding
-      Test.Wmd.SearchQuery
+      Wmd.Test.PercentEncodingTest
+      Wmd.Test.SearchQueryTest
       Paths_wmd
   hs-source-dirs:
       test
@@ -121,30 +140,38 @@ test-suite wmd-test
       LambdaCase
       ImportQualifiedPost
       NoStarIsType
+      OverloadedRecordDot
       OverloadedStrings
       QuasiQuotes
+      RecordWildCards
       ScopedTypeVariables
       TemplateHaskell
       TypeApplications
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      base
     , blaze-html
+    , bytestring
     , containers
+    , either
+    , fmt
     , htoml-megaparsec
-    , htoml-parse
     , lens
     , megaparsec
     , mtl
+    , optparse-applicative
     , scotty
     , tagsoup
     , tasty
-    , tasty-hedgehog
+    , tasty-golden
+    , tasty-golden-easy
     , tasty-hunit
     , tasty-quickcheck
     , text
+    , text-show
+    , transformers
     , unordered-containers
     , vector
     , wai-extra
     , wmd
-  default-language: Haskell2010
+  default-language: GHC2021

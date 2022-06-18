@@ -1,20 +1,39 @@
-module Wmd.App where
+module Wmd.App (
+  runApp,
+) where
 
-import Data.Text (Text)
-import Wmd.Config (Config, config)
-import Wmd.TargetURLMaker (TargetURLMaker)
+import Control.Monad.Reader (MonadTrans (lift), ReaderT (runReaderT), asks)
+import Data.Either.Combinators (fromRight)
+import Data.Vector (Vector)
+import Data.Vector qualified as Vector
+import Data.Word (Word16)
+import Wmd.Cli (Flags (..), getFlags)
+import Wmd.Config (getConfig)
+import Wmd.Config.Type (Config (..))
+import Wmd.HttpServer (ServerEnv (ServerEnv), runServer)
+import Wmd.TargetUrl (urlFactory)
+import Wmd.Type.SearchTarget (SearchTarget, fromConfig)
 
-type Prefix = Text
-
-type Keywords = Text
-
-data App = App
-  { urlGenerators :: TargetURLMaker
+data AppEnv = AppEnv
+  { serverPort :: Word16
+  , urlTargets :: Vector SearchTarget
   }
+  deriving (Show)
 
-app :: MonadFail m => Config -> m App
-app cfg = do
-  undefined
+type AppM a = ReaderT AppEnv IO a
 
-run :: IO ()
-run = config "../wmd.toml" >>= pure . maybe undefined id . app >> undefined
+appEnv :: Flags -> Config -> AppEnv
+appEnv flags config = AppEnv flags.port (Vector.map fromConfig config.targets)
+
+app :: AppM ()
+app = do
+  port <- asks serverPort
+  targets <- asks urlTargets
+  lift $ runServer (ServerEnv port (urlFactory targets) (targets))
+
+runApp :: IO ()
+runApp = do
+  !flags <- getFlags
+  !config <- fromRight (error "failed to get config") <$> getConfig
+  let env = appEnv flags config
+  runReaderT app env

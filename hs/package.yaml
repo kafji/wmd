@@ -8,23 +8,23 @@ copyright: "2022 Kafji"
 extra-source-files:
   - README.md
 
-# To avoid duplicated efforts in documentation and dealing with the
-# complications of embedding Haddock markup inside cabal files, it is
-# common to point users to the README.md file.
-description: Please see the README on GitHub at <https://github.com/kafji/wmd#readme>
-
 dependencies:
-  - base >= 4.7 && < 5
+  - base
   - blaze-html
+  - bytestring
   - containers
+  - either
+  - fmt
   - htoml-megaparsec
-  - htoml-parse
   - lens
   - megaparsec
   - mtl
+  - optparse-applicative
   - scotty
   - tagsoup
   - text
+  - text-show
+  - transformers
   - unordered-containers
   - vector
   - wai-extra
@@ -38,8 +38,10 @@ default-extensions:
   - LambdaCase
   - ImportQualifiedPost
   - NoStarIsType
+  - OverloadedRecordDot
   - OverloadedStrings
   - QuasiQuotes
+  - RecordWildCards
   - ScopedTypeVariables
   - TemplateHaskell
   - TypeApplications
@@ -50,7 +52,7 @@ library:
   source-dirs: src
 
 executables:
-  wmd-hs-exe:
+  wmd-app:
     main: Main.hs
     source-dirs: app
     ghc-options:
@@ -65,7 +67,7 @@ executables:
 
 tests:
   wmd-test:
-    main: Test.hs
+    main: Main.hs
     source-dirs: test
     ghc-options:
       - -threaded
@@ -74,6 +76,7 @@ tests:
     dependencies:
       - wmd
       - tasty
+      - tasty-golden
+      - tasty-golden-easy
       - tasty-hunit
       - tasty-quickcheck
-      - tasty-hedgehog

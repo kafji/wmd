@@ -1,23 +1,19 @@
-{-# LANGUAGE BlockArguments #-}
-{-# LANGUAGE ConstraintKinds #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE ImportQualifiedPost #-}
-{-# LANGUAGE InstanceSigs #-}
-{-# LANGUAGE OverloadedStrings #-}
+{- |
+Defines search query data type and its text parser.
+-}
+module Wmd.SearchQuery (
+  parseSearchQuery,
+) where
 
-module Wmd.SearchQuery where
-
-import Data.Text
-import Data.Void
-import Text.Megaparsec
-import Text.Megaparsec.Char
-import Wmd.Types
-
-data SearchQuery = Query
-  { prefix :: (Maybe QueryPrefix)
-  , keywords :: QueryKeywords
-  }
-  deriving (Show, Eq)
+import Data.Text (Text)
+import Data.Void (Void)
+import Text.Megaparsec (
+  MonadParsec (takeWhile1P, try),
+  parseMaybe,
+  (<|>),
+ )
+import Text.Megaparsec.Char (char)
+import Wmd.Type.SearchQuery (SearchQuery (SearchQuery))
 
 type Parser m = MonadParsec Void Text m
 
@@ -29,7 +25,7 @@ separatorParser = char ' ' >> pure ()
 --
 -- >>> parseMaybe prefixParser "hello"
 -- Nothing
-prefixParser :: Parser m => m QueryPrefix
+prefixParser :: Parser m => m Text
 prefixParser = takeWhile1P Nothing (/= ' ') <* separatorParser
 
 -- >>> parseMaybe keywordsParser "world"
@@ -37,7 +33,7 @@ prefixParser = takeWhile1P Nothing (/= ' ') <* separatorParser
 --
 -- >>> parseMaybe keywordsParser " world"
 -- Just " world"
-keywordsParser :: Parser m => m QueryKeywords
+keywordsParser :: Parser m => m Text
 keywordsParser = do
   takeWhile1P Nothing (const True)
 
@@ -50,7 +46,7 @@ completeQueryParser :: Parser m => m SearchQuery
 completeQueryParser = do
   p <- prefixParser
   k <- keywordsParser
-  pure $ Query (Just p) k
+  pure $ SearchQuery (Just p) k
 
 -- >>> parseMaybe partialQueryParser "hello world"
 -- Just (Query Nothing "hello world")
@@ -60,7 +56,7 @@ completeQueryParser = do
 partialQueryParser :: Parser m => m SearchQuery
 partialQueryParser = do
   k <- keywordsParser
-  pure $ Query Nothing k
+  pure $ SearchQuery Nothing k
 
 -- >>> parseMaybe queryParser "hello   world"
 -- Just (Query (Just "hello") "  world")

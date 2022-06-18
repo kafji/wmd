@@ -3,11 +3,22 @@
 # For more information, please see the documentation at:
 #   https://docs.haskellstack.org/en/stable/lock_files
 
-packages: []
+packages:
+- completed:
+    name: tasty-golden-easy
+    version: 0.0.0.0
+    git: https://github.com/kafji/tasty-golden-easy.git
+    pantry-tree:
+      size: 1019
+      sha256: 975624471dcc630f44f23425828a478b0710e126eae2337960e651851d21ab3f
+    commit: 94208cae0455c0d8924d2f183d93966d907e69d0
+  original:
+    git: https://github.com/kafji/tasty-golden-easy.git
+    commit: 94208cae0455c0d8924d2f183d93966d907e69d0
 snapshots:
 - completed:
-    size: 588043
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/nightly/2022/5/20.yaml
-    sha256: 7800e52de866bab899c118558f3a48e455f9f57fb3b3595e0002018fbea5ee58
+    size: 605110
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/nightly/2022/6/6.yaml
+    sha256: 26ea900ee8601fee24ff84981e92f304d384c73ee32d5504299133b5eb177e87
   original:
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/nightly/2022/5/20.yaml
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/nightly/2022/6/6.yaml
