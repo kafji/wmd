@@ -67,6 +67,4 @@ getSearch =
 
 -- | Handles `GET /prefixes`.
 getPrefixes :: Handler e
-getPrefixes = do
-  prefixes <- asks targets
-  html $ prefixesPage prefixes
+getPrefixes = asks targets >>= html . prefixesPage
