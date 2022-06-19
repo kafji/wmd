@@ -5,6 +5,7 @@ module Wmd.Html (
   homePage,
   searchPage,
   prefixesPage,
+  errorPage,
 ) where
 
 import Data.Foldable (traverse_)
@@ -89,3 +90,9 @@ searchForm =
         ! A.name "q"
       toHtml @Text " "
       button (toHtml @Text "Go")
+
+errorPage ::
+  -- | Message.
+  Text ->
+  TextL.Text
+errorPage msg = htmlWithBody $ p (toHtml ("error: " <> msg))

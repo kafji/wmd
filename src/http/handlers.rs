@@ -116,6 +116,7 @@ pub struct SearchParams {
     q: String,
 }
 
+#[cfg_attr(debug_assertions, debug_handler)]
 pub async fn get_search(
     Query(params): Query<SearchParams>,
     Extension(env): Extension<Env>,

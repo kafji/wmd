@@ -6,7 +6,6 @@ module Wmd.HttpServer (
   getServer,
 ) where
 
-import Control.Applicative (Alternative ((<|>)))
 import Control.Monad.Reader (
   ReaderT (runReaderT),
   asks,
@@ -17,8 +16,9 @@ import Data.Text.Lazy qualified as TextL
 import Data.Vector (Vector)
 import Network.Wai (Application)
 import Network.Wai.Middleware.RequestLogger (logStdout)
+import Web.Scotty.Internal.Types ()
 import Web.Scotty.Trans
-import Wmd.Html (homePage, prefixesPage, searchPage)
+import Wmd.Html (errorPage, homePage, prefixesPage)
 import Wmd.SearchQuery (parseSearchQuery)
 import Wmd.Type.SearchQuery (SearchQuery)
 import Wmd.Type.SearchTarget (SearchTarget)
@@ -53,7 +53,9 @@ getIndex = html homePage
 -- | Handles `GET /search`.
 getSearch :: Handler e
 getSearch =
-  (param "q" >>= toTarget) <|> html searchPage
+  do
+    q <- rescue (Just <$> param "q") (const (pure Nothing))
+    maybe (html (errorPage "missing `q` param")) toTarget q
   where
     toTarget query = do
       query' <- case parseSearchQuery query of
