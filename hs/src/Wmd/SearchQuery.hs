@@ -66,10 +66,14 @@ partialQueryParser = do
 queryParser :: Parser m => m SearchQuery
 queryParser = try completeQueryParser <|> partialQueryParser
 
--- >>> parseSearchQuery "hello   world"
--- Right (Query (Just "hello") "  world")
---
--- >>> parseSearchQuery "hello"
--- Right (Query Nothing "hello")
+{- |
+Parses @Text@ to @SearchQuery@.
+
+>>> parseSearchQuery "hello   world"
+Right (Query (Just "hello") "  world")
+
+>>> parseSearchQuery "hello"
+Right (Query Nothing "hello")
+-}
 parseSearchQuery :: Text -> Either Text SearchQuery
 parseSearchQuery s = maybe (Left "error") Right $ parseMaybe queryParser s

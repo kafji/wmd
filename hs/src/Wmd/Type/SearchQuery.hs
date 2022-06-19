@@ -5,7 +5,7 @@ module Wmd.Type.SearchQuery (
 import Data.Text (Text)
 
 data SearchQuery = SearchQuery
-  { prefix :: (Maybe Text)
+  { prefix :: Maybe Text
   , keywords :: Text
   }
   deriving (Show, Eq)

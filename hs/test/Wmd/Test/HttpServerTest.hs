@@ -17,7 +17,7 @@ httpServerTests =
     ]
 
 getPrefixesTest = $(expect) "GET /prefixes" do
-  server <- getServer (ServerEnv (const Nothing) targets)
+  server <- getServer (ServerEnv (const undefined) targets)
   body <- withSession server $ simpleBody <$> request (setPath defaultRequest "/prefixes")
   pure body
 

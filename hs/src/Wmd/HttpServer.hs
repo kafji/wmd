@@ -11,12 +11,10 @@ import Control.Monad.Reader (
   asks,
  )
 import Data.Text (Text)
-import Data.Text qualified as Text
 import Data.Text.Lazy qualified as TextL
 import Data.Vector (Vector)
 import Network.Wai (Application)
 import Network.Wai.Middleware.RequestLogger (logStdout)
-import Web.Scotty.Internal.Types ()
 import Web.Scotty.Trans
 import Wmd.Html (errorPage, homePage, prefixesPage)
 import Wmd.SearchQuery (parseSearchQuery)
@@ -24,7 +22,7 @@ import Wmd.Type.SearchQuery (SearchQuery)
 import Wmd.Type.SearchTarget (SearchTarget)
 
 data ServerEnv = ServerEnv
-  { createUrl :: SearchQuery -> Maybe Text
+  { createUrl :: SearchQuery -> Text
   , targets :: Vector SearchTarget
   }
 
@@ -51,22 +49,26 @@ getIndex :: Handler e
 getIndex = html homePage
 
 -- | Handles `GET /search`.
-getSearch :: Handler e
+getSearch :: forall e. Handler e
 getSearch =
   do
     q <- rescue (Just <$> param "q") (const (pure Nothing))
-    maybe (html (errorPage "missing `q` param")) toTarget q
+    maybe (errorPage' "missing `q` param") toTarget q
   where
-    toTarget query = do
-      query' <- case parseSearchQuery query of
-        Right x -> pure x
-        Left e -> fail $ Text.unpack e
-      createUrl' <- asks createUrl
-      url <- case createUrl' query' of
-        Just x -> pure x
-        Nothing -> fail ""
-      redirect $ TextL.fromStrict url
+    toTarget =
+      either
+        ( -- todo(kfj): log the actual error
+          const (errorPage' "failed to parse search query")
+        )
+        redirectToTarget
+        . parseSearchQuery
+    redirectToTarget q = do
+      url <- (\f -> f q) <$> asks createUrl
+      redirect (TextL.fromStrict url)
 
 -- | Handles `GET /prefixes`.
 getPrefixes :: Handler e
 getPrefixes = asks targets >>= html . prefixesPage
+
+errorPage' :: (ScottyError e) => Text -> ActionT e ServerM ()
+errorPage' msg = html (errorPage msg)
