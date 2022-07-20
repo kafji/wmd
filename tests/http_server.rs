@@ -77,13 +77,28 @@ async fn test_get_index_with_param() {
 
 #[tokio::test]
 async fn test_do_search() {
-    let response = request_once!("/search?q=drx%20tokio");
+    {
+        // trivial case
 
-    assert_eq!(response.status(), StatusCode::TEMPORARY_REDIRECT);
-    assert_eq!(
-        response.headers().get("location").unwrap(),
-        "https://docs.rs/tokio"
-    );
+        let response = request_once!("/search?q=drx%20tokio");
+
+        assert_eq!(response.status(), StatusCode::TEMPORARY_REDIRECT);
+        assert_eq!(
+            response.headers().get("location").unwrap(),
+            "https://docs.rs/tokio"
+        );
+    };
+
+    {
+        // keywords should be trimmed
+        let response = request_once!("/search?q=drx%20tokio%20");
+
+        assert_eq!(response.status(), StatusCode::TEMPORARY_REDIRECT);
+        assert_eq!(
+            response.headers().get("location").unwrap(),
+            "https://docs.rs/tokio"
+        );
+    };
 }
 
 #[tokio::test]

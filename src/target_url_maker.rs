@@ -43,7 +43,8 @@ impl TargetUrlMaker {
             Some(x) => x,
             None => return None,
         };
-        let url = maker(encode(query.keywords()).as_str());
+        let keywords = query.keywords().trim();
+        let url = maker(encode(keywords).as_str());
         Some(Url::parse(&url).map_err(|err| anyhow!(err)))
     }
 }
