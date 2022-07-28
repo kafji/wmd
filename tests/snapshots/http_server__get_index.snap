@@ -8,15 +8,33 @@ expression: body
 
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <title>Wmd</title>
+
   <link rel="search" href="/opensearch.xml" type="application/opensearchdescription+xml" title="Wmd">
+
+  <style>
+    #keywords-input {
+      font-size: 20px;
+      padding: 5px;
+      margin: 5px;
+    }
+
+    #submit-button {
+      font-size: 20px;
+      padding: 5px;
+      margin: 5px;
+    }
+
+  </style>
 </head>
 
 <body>
   <p>
   <form method="GET" action="/search">
-    <input type="text" name="q" value="">
-    <button>Go</button>
+    <input id="keywords-input" type="text" name="q" value="">
+    <button id="submit-button">Search</button>
   </form>
   </p>
 
