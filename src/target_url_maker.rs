@@ -18,6 +18,7 @@ struct Inner {
 impl TargetUrlMaker {
     pub fn new(targets: &[SearchTarget]) -> Result<Self, Error> {
         ensure!(!targets.is_empty());
+
         let registry = targets
             .iter()
             .cloned()
@@ -27,6 +28,7 @@ impl TargetUrlMaker {
                 (tgt.prefix, f)
             })
             .collect::<HashMap<_, _>>();
+
         let s = Self {
             inner: Arc::new(Inner { registry }),
         };
@@ -39,6 +41,11 @@ impl TargetUrlMaker {
             Some(x) => x,
             None => return None,
         };
+
+        if prefix == "ripm" {
+            return Some(crate::ripm::ripm(query.keywords()));
+        }
+
         let maker = match self.inner.registry.get(prefix) {
             Some(x) => x,
             None => return None,
