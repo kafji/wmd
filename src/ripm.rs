@@ -1,23 +1,20 @@
 //! Transforms keywords in known mobile URL to its non-mobile URL.
 //! For example, wikipedia https://en.m.wikipedia.org/wiki/Bakso to https://en.wikipedia.org/wiki/Bakso
 
+use anyhow::{anyhow, bail};
 use std::borrow::Cow;
 use url::{Host, Url};
 
 pub fn ripm(keywords: &str) -> Result<Url, anyhow::Error> {
-    // todo(kfj): what would be the result of `ripm` on:
-    //   - not a valid url
-    //   - host is ip instead of domain
-    //   - not one of known domains
-
     let url = Url::parse(keywords)?;
 
-    let host = url.host().unwrap();
+    let host = url.host().ok_or_else(|| anyhow!("URL doesn't have host"))?;
+
     let domain = match host {
         Host::Domain(x) => x,
-        Host::Ipv4(_) => todo!(),
-        Host::Ipv6(_) => todo!(),
+        _ => bail!("host is not a domain name"),
     };
+
     let path = url.path();
 
     let transformers = vec![WikipediaTransform];
@@ -29,7 +26,7 @@ pub fn ripm(keywords: &str) -> Result<Url, anyhow::Error> {
         }
     }
 
-    let transformed = transformed.unwrap();
+    let transformed = transformed.ok_or_else(|| anyhow!("found no valid transformer"))?;
 
     let mut new_url = url.clone();
     new_url.set_host(Some(&*transformed.0))?;

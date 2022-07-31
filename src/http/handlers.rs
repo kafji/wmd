@@ -118,11 +118,13 @@ pub struct SearchParams {
 
 #[cfg_attr(debug_assertions, debug_handler)]
 pub async fn get_search(
-    Query(params): Query<SearchParams>,
     Extension(env): Extension<Env>,
+    Query(params): Query<SearchParams>,
 ) -> Reply {
     let query = SearchQuery::new(&params.q);
+
     let url = env.target_url_maker().make_url(&query);
+
     Ok(match url {
         Some(url) => Redirect::temporary(
             url.map_err(|x| Error::InvalidTargetUrl {
