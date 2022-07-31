@@ -5,7 +5,7 @@ mod percent_encoding;
 mod ripm;
 mod search_query;
 mod search_targets;
-mod target_url_maker;
+mod url_maker;
 mod templating;
 
 #[cfg(debug_assertions)]

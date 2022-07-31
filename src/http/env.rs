@@ -1,7 +1,7 @@
 use crate::{
     app::SearchTarget,
     search_targets::SearchTargets,
-    target_url_maker::TargetUrlMaker,
+    url_maker::UrlMaker,
     templating::{create_templates, Templates},
 };
 use anyhow::Error;
@@ -15,7 +15,7 @@ pub struct Env(Arc<Inner>);
 struct Inner {
     base_url: Url,
     templates: Templates,
-    url_maker: TargetUrlMaker,
+    url_maker: UrlMaker,
     search_targets: Vec<SearchTarget>,
     search_targets2: SearchTargets,
 }
@@ -23,7 +23,7 @@ struct Inner {
 impl Env {
     pub fn new(base_url: Url, search_targets: Vec<SearchTarget>) -> Result<Self, Error> {
         let templates = create_templates()?;
-        let url_maker = TargetUrlMaker::new(&search_targets)?;
+        let url_maker = UrlMaker::new(&search_targets)?;
         let search_targets2 = SearchTargets::new(search_targets.clone())?;
         let i = Inner {
             base_url,
@@ -44,7 +44,7 @@ impl Env {
         &self.0.templates
     }
 
-    pub fn target_url_maker(&self) -> &TargetUrlMaker {
+    pub fn target_url_maker(&self) -> &UrlMaker {
         &self.0.url_maker
     }
 

@@ -4,7 +4,7 @@ use std::{collections::HashMap, sync::Arc};
 use url::Url;
 
 #[derive(Clone)]
-pub struct TargetUrlMaker {
+pub struct UrlMaker {
     inner: Arc<Inner>,
 }
 
@@ -15,7 +15,7 @@ struct Inner {
     >,
 }
 
-impl TargetUrlMaker {
+impl UrlMaker {
     pub fn new(targets: &[SearchTarget]) -> Result<Self, Error> {
         ensure!(!targets.is_empty());
 
@@ -67,7 +67,7 @@ mod tests {
             prefix: String::from("ex"),
             url_template: String::from("http://example.com?q={keywords}"),
         }];
-        let maker = TargetUrlMaker::new(&targets).unwrap();
+        let maker = UrlMaker::new(&targets).unwrap();
 
         let url = maker
             .make_url(&SearchQuery::new("ex hello"))
@@ -91,7 +91,7 @@ mod tests {
                 url_template: String::from("https://hoogle.haskell.org/?hoogle={keywords}"),
             },
         ];
-        let maker = TargetUrlMaker::new(&targets).unwrap();
+        let maker = UrlMaker::new(&targets).unwrap();
 
         let url = maker
             .make_url(&SearchQuery::new("hg +mtl reader"))
@@ -111,7 +111,7 @@ mod tests {
             prefix: String::from("ex"),
             url_template: String::from("http://example.com?q={keywords}"),
         }];
-        let maker = TargetUrlMaker::new(&targets).unwrap();
+        let maker = UrlMaker::new(&targets).unwrap();
 
         let url = maker.make_url(&SearchQuery::new("hello world"));
         assert!(url.is_none())
