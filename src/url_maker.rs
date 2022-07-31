@@ -42,6 +42,7 @@ impl UrlMaker {
             None => return None,
         };
 
+        // todo(kfj): move this into registry
         if prefix == "ripm" {
             return Some(crate::ripm::ripm(query.keywords()));
         }
