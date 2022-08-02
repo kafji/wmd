@@ -1,6 +1,8 @@
 //! Transforms keywords in known mobile URL to its non-mobile URL.
 //! For example, wikipedia https://en.m.wikipedia.org/wiki/Bakso to https://en.wikipedia.org/wiki/Bakso
 
+// todo(kfj): is there a way to make this configurable like the search url mapper?
+
 use anyhow::{anyhow, bail};
 use std::borrow::Cow;
 use url::{Host, Url};

@@ -1,4 +1,5 @@
 use crate::{percent_encoding, ripm};
+use anyhow::Error;
 use std::collections::HashMap;
 use url::Url;
 
@@ -22,7 +23,7 @@ struct UrlTemplate<'app> {
 }
 
 impl<'app> UrlTemplate<'app> {
-    fn create_url(&self, keywords: &str) -> Result<Url, anyhow::Error> {
+    fn create_url(&self, keywords: &str) -> Result<Url, Error> {
         let keywords = percent_encoding::encode(&keywords);
         let url = self.template.replace("{keywords}", keywords.as_str());
         let url = Url::parse(&url)?;
@@ -33,7 +34,7 @@ impl<'app> UrlTemplate<'app> {
 #[derive(Debug)]
 pub enum Output {
     /// Command is to redirect to the specified URL.
-    Redirect(Result<Url, anyhow::Error>),
+    Redirect(Result<Url, Error>),
 
     /// Processor can't handle the command.
     Unhandled,
@@ -54,6 +55,9 @@ pub fn process(registry: &Registry, command: &str) -> Output {
 
     match registry.url_map.get(prefix) {
         None => Output::Unhandled,
-        Some(template) => Output::Redirect(template.create_url(&keywords)),
+        Some(template) => {
+            let url = template.create_url(&keywords);
+            Output::Redirect(url)
+        }
     }
 }

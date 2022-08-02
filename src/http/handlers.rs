@@ -60,14 +60,17 @@ type Reply = Result<Response, Error>;
 /// Denotes failure when handling response.
 #[derive(Debug)]
 pub enum Error {
-    Renderer { desc: String },
-    InvalidTargetUrl { desc: String },
-}
+    /// Failed to render HTML document.
+    Renderer {
+        /// Error description.
+        desc: String,
+    },
 
-impl From<RenderError> for Error {
-    fn from(s: RenderError) -> Self {
-        Self::Renderer { desc: s.desc }
-    }
+    /// Failed to create target URL.
+    InvalidTargetUrl {
+        /// Error description.
+        desc: String,
+    },
 }
 
 impl IntoResponse for Error {
@@ -87,12 +90,19 @@ impl IntoResponse for Error {
     }
 }
 
+impl From<RenderError> for Error {
+    fn from(s: RenderError) -> Self {
+        Self::Renderer { desc: s.desc }
+    }
+}
+
 #[derive(Debug, Deserialize)]
 pub struct IndexParams {
+    /// Search keywords.
     k: Option<String>,
 }
 
-#[cfg_attr(debug_assertions, axum_macros::debug_handler)]
+#[cfg_attr(debug_assertions, debug_handler)]
 pub async fn get_index(Extension(env): Extension<Env>, Query(params): Query<IndexParams>) -> Reply {
     let query: Option<String> = params.k.map(|keywords| {
         // todo(kfj): should not panic
@@ -115,6 +125,7 @@ pub async fn get_index(Extension(env): Extension<Env>, Query(params): Query<Inde
 
 #[derive(Debug, Deserialize)]
 pub struct SearchParams {
+    /// Search query.
     q: String,
 }
 
