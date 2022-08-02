@@ -50,7 +50,7 @@ macro_rules! reply_with_text {
 macro_rules! respond_failure {
     ($desc:expr, $code:expr, $display:expr) => {{
         tracing::error!("{}", $desc);
-        ($code, $display).into_response()
+        ($code, format!("Error.\n{}", $display)).into_response()
     }};
 }
 
