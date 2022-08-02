@@ -1,3 +1,5 @@
+//! HTML templating.
+
 use anyhow::{bail, Error};
 use handlebars::Handlebars;
 use rust_embed::RustEmbed;

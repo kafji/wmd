@@ -1,11 +1,10 @@
 mod app;
+mod command_processing;
 mod config;
 mod http;
 mod percent_encoding;
 mod ripm;
-mod search_query;
 mod search_targets;
-mod url_maker;
 mod templating;
 
 #[cfg(debug_assertions)]

@@ -3,7 +3,7 @@ HTTP requests handlers.
 */
 
 use super::env::Env;
-use crate::{search_query::SearchQuery, templating::Template::*};
+use crate::{command_processing, templating::Template::*};
 use axum::{
     body::Full,
     extract::Query,
@@ -121,25 +121,24 @@ pub async fn get_search(
     Extension(env): Extension<Env>,
     Query(params): Query<SearchParams>,
 ) -> Reply {
-    let query = SearchQuery::new(&params.q);
-
-    let url = env.target_url_maker().make_url(&query);
-
-    Ok(match url {
-        Some(url) => Redirect::temporary(
-            url.map_err(|x| Error::InvalidTargetUrl {
+    let registry = env.command_registry();
+    let output = command_processing::process(&registry, &params.q);
+    let response = match output {
+        command_processing::Output::Redirect(url) => {
+            let url = url.map_err(|x| Error::InvalidTargetUrl {
                 desc: x.to_string(),
-            })?
-            .as_str(),
-        )
-        .into_response(),
-        None => {
+            })?;
+            Redirect::temporary(url.as_str()).into_response()
+        }
+        command_processing::Output::Unhandled => {
+            // processor can't handle this command, redirect to homepage/search-form-page
             let mut url = env.base_url().clone();
-            let params = Some(format!("k={}", query.into_str()));
+            let params = Some(format!("k={}", &params.q));
             url.set_query(params.as_deref());
             Redirect::temporary(url.as_str()).into_response()
         }
-    })
+    };
+    Ok(response)
 }
 
 #[cfg_attr(debug_assertions, debug_handler)]

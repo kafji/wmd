@@ -43,7 +43,7 @@ trait Transform {
 struct WikipediaTransform;
 
 impl Transform for WikipediaTransform {
-    fn can_transform(&self, domain: &str, path: &str) -> bool {
+    fn can_transform(&self, domain: &str, _path: &str) -> bool {
         let parts = domain.split('.').collect::<Vec<_>>();
         if parts.len() != 4 {
             return false;
