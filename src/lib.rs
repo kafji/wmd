@@ -4,7 +4,6 @@ mod config;
 mod http;
 mod percent_encoding;
 mod ripm;
-mod search_targets;
 mod templating;
 
 #[cfg(debug_assertions)]

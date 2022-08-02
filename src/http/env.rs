@@ -1,10 +1,9 @@
 use crate::{
     app::SearchTarget,
     command_processing::{self, Registry},
-    search_targets::SearchTargets,
     templating::{create_templates, Templates},
 };
-use anyhow::Error;
+use anyhow::{anyhow, Error};
 use std::sync::Arc;
 use url::Url;
 
@@ -16,14 +15,13 @@ struct Inner {
     base_url: Url,
     templates: Templates,
     search_targets: Vec<SearchTarget>,
-    search_targets2: SearchTargets,
     command_registry: Registry,
+    default_target: SearchTarget,
 }
 
 impl Env {
     pub fn new(base_url: Url, search_targets: Vec<SearchTarget>) -> Result<Self, Error> {
         let templates = create_templates()?;
-        let search_targets2 = SearchTargets::new(search_targets.clone())?;
 
         let command_registry = command_processing::Registry::new(
             search_targets
@@ -31,12 +29,20 @@ impl Env {
                 .map(|x| (x.prefix.as_str(), x.url_template.as_str())),
         );
 
+        let default_target = search_targets
+            .first()
+            .ok_or_else(|| anyhow!("search targets is empty"))?
+            .clone();
+
         let i = Inner {
             base_url,
             templates,
+
             search_targets,
-            search_targets2,
+
             command_registry,
+
+            default_target,
         };
         let s = Self(Arc::new(i));
         Ok(s)
@@ -54,8 +60,8 @@ impl Env {
         &self.0.search_targets
     }
 
-    pub fn search_targets2(&self) -> &SearchTargets {
-        &self.0.search_targets2
+    pub fn default_target(&self) -> &SearchTarget {
+        &self.0.default_target
     }
 
     pub fn command_registry(&self) -> &Registry {
