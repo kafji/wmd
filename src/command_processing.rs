@@ -3,27 +3,25 @@ use std::collections::HashMap;
 use url::Url;
 
 #[derive(Debug)]
-pub struct Registry {
-    url_map: HashMap<String, UrlTemplate>,
+pub struct Registry<'app> {
+    url_map: HashMap<&'app str, UrlTemplate<'app>>,
 }
 
-impl Registry {
-    pub fn new<'a>(
-        url_templates: impl Iterator<Item = (impl Into<String>, impl Into<String>)>,
-    ) -> Self {
+impl<'app> Registry<'app> {
+    pub fn new(url_templates: impl Iterator<Item = (&'app str, &'app str)>) -> Self {
         let url_map = url_templates
-            .map(|(x, y)| (x.into(), UrlTemplate { template: y.into() }))
+            .map(|(x, y)| (x, UrlTemplate { template: y }))
             .collect();
         Self { url_map }
     }
 }
 
 #[derive(Debug)]
-struct UrlTemplate {
-    template: String,
+struct UrlTemplate<'app> {
+    template: &'app str,
 }
 
-impl UrlTemplate {
+impl<'app> UrlTemplate<'app> {
     fn create_url(&self, keywords: &str) -> Result<Url, anyhow::Error> {
         let keywords = percent_encoding::encode(&keywords);
         let url = self.template.replace("{keywords}", keywords.as_str());

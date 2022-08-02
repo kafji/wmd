@@ -95,7 +95,9 @@ pub struct IndexParams {
 #[cfg_attr(debug_assertions, axum_macros::debug_handler)]
 pub async fn get_index(Extension(env): Extension<Env>, Query(params): Query<IndexParams>) -> Reply {
     let query: Option<String> = params.k.map(|keywords| {
-        let prefix = &env.default_target().prefix;
+        // todo(kfj): should not panic
+        let prefix = &env.default_target().unwrap().prefix;
+
         let mut query = String::with_capacity(prefix.len() + 1 + keywords.len());
         query.push_str(prefix);
         query.push(' ');
